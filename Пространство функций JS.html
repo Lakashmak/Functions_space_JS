@@ -593,6 +593,18 @@
                 for(let n = dx; n <= 1; n += dx) result = Complex.Sub(0, Complex.Ln(n)).Pow(Complex.Sub(a, 1)).Mul(dx).Sum(result);
                 return result;
             }
+
+            Tetr(b) {
+                const d = 0.001; var result = new Complex(0); var z = new Complex(this.Re, this.Im).Sub(0);
+                b = new Complex(b);
+                //for(let n = d; n <= 1; n += d) result = Complex.Sub(0, Complex.Ln(n)).Pow(z).Mul(d).Sum(result); //new Complex(n).Pow(this.Sub(1)).Mul(Math.exp(-n)).Mul(dx).Sum(result);
+                var n = b.Sub(-1).Dround().Re;
+                //b.Mod(1).Mul(Math.PI).Cos().Mul(-1).Sum(1).Div(2);
+                result = b.Mod(1).Pow(this.Ln().Pow(Complex.Div(1, z.Re))); //z.Log(z).Mul(Complex.Sub(1, b.Mod(1))).Sum(z.Mul(b.Mod(1)));
+                for(let i = 0; i < n; i++) result = this.Sub(0).Pow(result);
+                for(let i = 0; i < -n; i++) result = result.Log(this.Sum(0));
+                return result;
+            }
         }
 
         class Operation {
@@ -893,6 +905,7 @@
                     else if (formula[i] == '≡') formula1 += '=';
                     else if (formula[i] == '↔') formula1 += '=';
                     else if (formula[i] == '⇔') formula1 += '=';
+
                     else formula1 += String(formula[i]);
                 }
                 formula = formula1;
@@ -1175,6 +1188,7 @@
                 else if (["Asech", "asech", "Arcsech", "arcsech", "Arsech", "arsech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ach();
                 else if (["Acsch", "acsch", "Acosech", "acosech", "Arccsch", "arccsch", "Arccosech", "arccosech", "Arcsch", "arcsch", "Arcosech", "arcosech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ash();
                 else if (op.name == "Fct" || op.name == "fct") op.value = args[0].Fct();
+                else if (op.name == "Tetr" || op.name == "tetr") op.value = args[0].Tetr(args[1]);
                 //Def, Itg
 
                 op.relevance = true;
