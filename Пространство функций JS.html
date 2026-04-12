@@ -131,10 +131,34 @@
                 }
             }
 
-            Abs() { // |z| модуль (абсолютное значение)
-                return Math.sqrt(this.Re * this.Re + this.Im * this.Im);
+            Round() { return new Complex(Math.round(this.Re), Math.round(this.Im)); } 
+            static Round(a) {
+                if(typeof a == "number") {
+                    return Math.round(a);
+                } else if (a instanceof Complex) {
+                    return new Complex(Math.round(a.Re), Math.round(a.Im));
+                }
             }
 
+            Uround() { return new Complex(Math.ceil(this.Re), Math.ceil(this.Im)); }
+            static Uround(a) {
+                if(typeof a == "number") {
+                    return Math.ceil(a);
+                } else if (a instanceof Complex) {
+                    return new Complex(Math.ceil(a.Re), Math.ceil(a.Im));
+                }
+            }
+
+            Dround() { return new Complex(Math.floor(this.Re), Math.floor(this.Im)); }
+            static Dround(a) {
+                if(typeof a == "number") {
+                    return Math.floor(a);
+                } else if (a instanceof Complex) {
+                    return new Complex(Math.floor(a.Re), Math.floor(a.Im));
+                }
+            }
+
+            Abs() { return Math.sqrt(this.Re * this.Re + this.Im * this.Im); }
             static Abs(a) { // |z| модуль (абсолютное значение)
                 if (typeof a === 'number') {
                     return Math.abs(a);
@@ -266,6 +290,38 @@
                 throw new Error('Invalid arguments');
             }
 
+            Mod(b) { return this.Sub(Complex.Dround(this.Div(b)).Mul(b)); }
+            static Mod(a, b) {
+                if(typeof a == "number" && typeof b == "number") {
+                    return a % b;
+                } else if (a instanceof Complex || b instanceof Complex ) {
+                    return a.Sub(Complex.Dround(a.Div(b)).Mul(b));
+                }
+            }
+
+            Gmod(b) { return this.Sub(Complex.Round(this.Div(b)).Mul(b)); }
+            static Gmod(a, b) { return Complex.Sub(a, Complex.Round(Complex.Div(a, b)).Mul(b)); }
+
+            Gcd(b) { var a = new Complex(this.Re, this.Im); return Complex.Gcd(a, b); }
+            static Gcd(a, b) {
+                if(Complex.Abs(a) == 0 && Complex.Abs(b) == 0) return new Complex(0);
+                if(Complex.Abs(a) == 0) return b;
+                if(Complex.Abs(b) == 0) return a;
+                var c1, c2;
+                if(a.Abs() >= b.Abs()) { c1 = a; c2 = b; }
+                else { c1 = b; c2 = a; }
+                var c3 = c1.Mod(c2);
+                while (c3.Abs() > 0.00001) {
+                    c1 = c2; 
+                    c2 = c3; 
+                    c3 = c1.Mod(c2);
+                }
+                return new Complex(c2);
+            }
+
+            Lcm(b) { var a = new Complex(this.Re, this.Im); return Complex.Lcm(a, b); }
+            static Lcm(a, b) { return a.Mul(b).Div(a.Gcd(b)); }
+
             Arg() { // угол направления числа
                 return Math.acos(this.Sign().Re) * Complex.Sign(Math.asin(this.Sign().Im));
             }
@@ -383,21 +439,22 @@
             }
             
             Ln() { // ln() натуральный логарифм через предел
-                const d = 4.8;
-                const c1 = Complex.Mul(Math.pow(this.Abs(), Math.pow(0.1, d)), Complex.Drct(this.Arg() * Math.pow(0.1, d)));
-                const c2 = Complex.Mul(Math.pow(10, d), Complex.Sub(c1, 1));
-                return c2;
+                // const d = 4.8;
+                // const c1 = Complex.Mul(Math.pow(this.Abs(), Math.pow(0.1, d)), Complex.Drct(this.Arg() * Math.pow(0.1, d)));
+                // const c2 = Complex.Mul(Math.pow(10, d), Complex.Sub(c1, 1));
+                return new Complex(Math.log(this.Abs()), this.Arg());
             }
 
             static Ln(a) {
-                const d = 4.8;
-                if (typeof a == "number") { // ln() натуральный логарифм через предел
-                    return new Complex(Math.log(a));
-                } else if (a instanceof Complex) { // ln() натуральный логарифм через предел
-                    const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
-                    const c2 = Complex.Mul(Math.pow(10, d), Complex.Sub(c1, 1));
-                    return c2;
-                }
+                // const d = 4.8;
+                // if (typeof a == "number") { // ln() натуральный логарифм через предел
+                //     return new Complex(Math.log(a));
+                // } else if (a instanceof Complex) { // ln() натуральный логарифм через предел
+                //     const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
+                //     const c2 = Complex.Mul(Math.pow(10, d), Complex.Sub(c1, 1));
+                //     return c2;
+                // }
+                return new Complex(Math.log(Complex.Abs(a)), Complex.Arg(a));
             }
 
             Log(a){ // log() логарифм
@@ -416,7 +473,7 @@
                 if (typeof a == "number") { // sin() синус
                     return new Complex(Math.sin(a));
                 } else if (a instanceof Complex) { // sin() синус
-                    return Complex.Div(Complex.Sub(Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, 1))), Complex.Pow(Math.E, Mul(a, new Complex(0, -1)))), new Complex(0, 2));
+                    return Complex.Div(Complex.Sub(Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, 1))), Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, -1)))), new Complex(0, 2));
                 }
             }
             
@@ -428,7 +485,7 @@
                 if (typeof a == "number") { // cos() косинус
                     return new Complex(Math.cos(a));
                 } else if (a instanceof Complex) {// cos() косинус
-                    return Complex.Div(Complex.Sum(Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, 1))), Complex.Pow(Math.E, Mul(a, new Complex(0, -1)))), 2);
+                    return Complex.Div(Complex.Sum(Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, 1))), Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, -1)))), 2);
                 }
             }
         
@@ -441,6 +498,114 @@
                     return new Complex(Math.tan(a));
                 } else if (a instanceof Complex) { // tg() тангенс
                     return Complex.Div(Complex.Sin(a), Complex.Cos(a));
+                }
+            }
+
+            Sh() { // sin() синус
+                return Complex.Div(Complex.Sub(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2);
+            }
+
+            static Sh(a) {// sin() синус
+                if (typeof a == "number") { // sin() синус
+                    return new Complex(Math.sinh(a));
+                } else if (a instanceof Complex) { // sin() синус
+                    return Complex.Div(Complex.Sub(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
+                }
+            }
+            
+            Ch() { // cos() косинус
+                return Complex.Div(Complex.Sum(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2);
+            }
+
+            static Ch(a) { // cos() косинус
+                if (typeof a == "number") { // cos() косинус
+                    return new Complex(Math.cosh(a));
+                } else if (a instanceof Complex) {// cos() косинус
+                    return Complex.Div(Complex.Sum(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
+                }
+            }
+        
+            Th() { // tg() тангенс
+                return Complex.Div(this.Sh(), this.Ch());
+            }
+
+            static Th(a) { // tg() тангенс
+                if (typeof a == "number") { // tg() тангенс
+                    return new Complex(Math.tanh(a));
+                } else if (a instanceof Complex) { // tg() тангенс
+                    return Complex.Div(Complex.Sh(a), Complex.Ch(a));
+                }
+            }
+
+            Asin() { // sin() синус
+                return Complex.Ln(this.Mul(new Complex(0, 1)).Sum(Complex.Pow(this.Mul(-1).Pow(2).Sum(1), 0.5))).Mul(new Complex(0, -1));
+            }
+
+            static Asin(a) {// sin() синус
+                if (typeof a == "number") { // sin() синус
+                    return new Complex(Math.asin(a));
+                } else if (a instanceof Complex) { // sin() синус
+                    return Complex.Ln(Complex.Mul(a, new Complex(0, 1)).Sum(Complex.Pow(Complex.Mul(a, -1).Pow(2).Sum(1), 0.5))).Mul(new Complex(0, -1));
+                }
+            }
+            
+            Acos() { // cos() косинус
+                return Complex.Sub(Math.PI / 2, this.Asin());
+            }
+
+            static Acos(a) { // cos() косинус
+                if (typeof a == "number") { // cos() косинус
+                    return new Complex(Math.acos(a));
+                } else if (a instanceof Complex) {// cos() косинус
+                    return Complex.Sub(Math.PI / 2, Complex.Asin(a));
+                }
+            }
+        
+            Atan() { // tg() тангенс
+                return Complex.Ln(this.Mul(new Complex(0, -1)).Sum(1)).Sub(Complex.Ln(this.Mul(new Complex(0, 1)).Sum(1))).Mul(0, 0.5);
+            }
+
+            static Atan(a) { // tg() тангенс
+                if (typeof a == "number") { // tg() тангенс
+                    return new Complex(Math.atan(a));
+                } else if (a instanceof Complex) { // tg() тангенс
+                    return Complex.Ln(Complex.Mul(a, new Complex(0, -1)).Sum(1)).Sub(Complex.Ln(Complex.Mul(a, new Complex(0, 1)).Sum(1))).Mul(0, 0.5);
+                }
+            }
+
+            Ash() { // sin() синус
+                return Complex.Ln(this.Sum(Complex.Pow(this.Pow(2).Sum(1), 0.5)));
+            }
+
+            static Ash(a) {// sin() синус
+                if (typeof a == "number") { // sin() синус
+                    return new Complex(Math.asinh(a));
+                } else if (a instanceof Complex) { // sin() синус
+                    return Complex.Ln(Complex.Sum(a, Complex.Pow(Complex.Pow(a, 2).Sum(1), 0.5)));
+                }
+            }
+            
+            Ach() { // cos() косинус
+                return Complex.Acos(this.Mul(new Complex(0, -1))).Mul(new Complex(0, 1));
+            }
+
+            static Ach(a) { // cos() косинус
+                if (typeof a == "number") { // cos() косинус
+                    return new Complex(Math.acosh(a));
+                } else if (a instanceof Complex) {// cos() косинус
+                    return Complex.Acos(Complex.Mul(a, new Complex(0, -1))).Mul(new Complex(0, 1));
+                }
+            }
+        
+            Ath() { // tg() тангенс
+                return Complex.Atan(this.Mul(new Complex(0, -1))).Mul(new Complex(0, 1));
+            }
+
+            static Ath(a) { // tg() тангенс
+                if (typeof a == "number") { // tg() тангенс
+                    return new Complex(Math.atanh(a));
+                } else if (a instanceof Complex) { // tg() тангенс
+                    return Complex.Atan(Complex.Mul(a, new Complex(0, -1))).Mul(new Complex(0, 1));
                 }
             }
         }
@@ -961,8 +1126,11 @@
                     for (var i = 1; i < args.length; i++) if ((args[i].Re > result || !(args[i].Re < result)) && (args[i].Re >= 0 || args[i].Re <= 0)) result = args[i].Re;
                     op.value = new Complex(result);
                 }
+                else if (op.name == "Round" || op.name == "round") op.value = args[0].Round();
+                else if (op.name == "Uround" || op.name == "uround") op.value = args[0].Uround();
+                else if (op.name == "Dround" || op.name == "dround") op.value = args[0].Dround();
                 else if (op.name == "Abs" || op.name == "abs") op.value = new Complex(args[0].Abs());
-                else if (op.name == "Sign" || op.name == "sign" || op.name == "sgn") op.value = args[0].Sign();
+                else if (["Sign", "sign", "Sgn", "sgn"].includes(op.name)) op.value = args[0].Sign();
                 else if (op.name == "Conj" || op.name == "conj") op.value = args[0].Conj();
                 else if (op.name == "Sum" || op.name == "sum") {
                     var result = new Complex(args[0]);
@@ -976,19 +1144,52 @@
                     op.value = result;
                 }
                 else if (op.name == "Div" || op.name == "div") op.value = args[0].Div(args[1]);
-                else if (op.name == "Arg" || op.name == "arg" || op.name == "Arg" || op.name == "angle") op.value = new Complex(args[0].Arg()); 
-                else if (op.name == "Drct" || op.name == "drct") op.value = args[0].Drct();
-                else if (op.name == "Exp" || op.name == "exp") op.value = args[0].Exp(args[1]);
+                else if (op.name == "Mod" || op.name == "mod") op.value = args[0].Mod(args[1]);
+                else if (op.name == "Gmod" || op.name == "gmod") op.value = args[0].Gmod(args[1]);
+                else if (["Lcm", "lcm", "НОК", "нок"].includes(op.name)) {
+                    var result = new Complex(args[0]);
+                    for (var i = 1; i < args.length; i++) result = result.Lcm(args[i]);
+                    op.value = result;
+                }
+                else if (["Gcd", "gcd", "НОД", "нод"].includes(op.name)) {
+                    var result = new Complex(args[0]);
+                    for (var i = 1; i < args.length; i++) result = result.Gcd(args[i]);
+                    op.value = result;
+                }
+                else if (["Arg", "arg", "Angle", "angle"].includes(op.name)) op.value = new Complex(args[0].Arg()); 
+                else if (["Drct", "drct", "Expi", "expi"].includes(op.name)) op.value = args[0].Drct();
+                else if (op.name == "Exp" || op.name == "exp") { if(args.length > 1) op.value = args[0].Exp(args[1]); else op.value = Complex.Pow(Math.E, args[0]); }
                 else if (op.name == "Pow" || op.name == "pow") op.value = args[0].Pow(args[1]);
+                else if (op.name == "Sqrt" || op.name == "sqrt") op.value = args[0].Pow(0.5);
+                else if (op.name == "Root" || op.name == "root") { if(args.length > 1) op.value = args[0].Pow(new Complex(1).Div(args[1])); else op.value = args[0].Pow(0.5); }
                 else if (op.name == "Ln" || op.name == "ln") op.value = args[0].Ln();
-                else if (op.name == "Log" || op.name == "log") op.value = args[0].Log(args[1]);
+                else if (op.name == "Lg" || op.name == "lg") op.value = args[0].Log(10);
+                else if (op.name == "Log" || op.name == "log") { if(args.length > 1) op.value = args[0].Log(args[1]); else op.value = args[0].Log(10);}
                 else if (op.name == "Sin" || op.name == "sin") op.value = args[0].Sin();
                 else if (op.name == "Cos" || op.name == "cos") op.value = args[0].Cos();
-                else if (op.name == "Tan" || op.name == "tan" || op.name == "tg") op.value = args[0].Tan();
+                else if (["Tan", "tan", "Tg", "tg"].includes(op.name)) op.value = args[0].Tan();
                 else if (op.name == "Ctg" || op.name == "ctg") op.value = new Complex(1).Div(args[0].Tan());
                 else if (op.name == "Sec" || op.name == "sec") op.value = new Complex(1).Div(args[0].Cos());
-                else if (op.name == "Csc" || op.name == "csc" || op.name == "cosec") op.value = new Complex(1).Div(args[0].Sin());
-                // Sqrt, Lcm, Gcd, Rou, Urou, Drou, Mod, Asin, Acos, Atan, Actg, Asec, Acsc, Sh, Ch, Th, Cth, Sech, Csch, Ash, Ach, Ath, Acth, Asech, Acsch, Def, Itg
+                else if (["Csc", "csc", "Cosec", "cosec"].includes(op.name)) op.value = new Complex(1).Div(args[0].Sin());
+                else if (["Asin", "asin", "Arcsin", "arcsin"].includes(op.name)) op.value = args[0].Asin();
+                else if (["Acos", "acos", "Arccos", "arccos"].includes(op.name)) op.value = args[0].Acos();
+                else if (["Atan", "atan", "Atg", "atg", "Arctan", "arctan", "Arctg", "arctg"].includes(op.name)) op.value = args[0].Atan();
+                else if (["Actg", "actg", "Arcctg", "arcctg"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Atan();
+                else if (["Asec", "asec", "Arcsec", "arcsec"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Acos();
+                else if (["Acsc", "acsc", "Acosec", "acosec", "Arccsc", "arccsc", "Arccosec", "arccosec"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Asin();
+                else if (["Sinh", "sinh", "Sh", "sh"].includes(op.name)) op.value = args[0].Sh();
+                else if (["Cosh", "cosh", "Ch", "ch"].includes(op.name)) op.value = args[0].Ch();
+                else if (["Tanh", "tanh", "Tgh", "tgh", "Th", "th"].includes(op.name)) op.value = args[0].Th();
+                else if (["Ctgh", "ctgh", "Cth", "cth"].includes(op.name)) op.value = new Complex(1).Div(args[0].Th());
+                else if (op.name == "Sech" || op.name == "sech") op.value = new Complex(1).Div(args[0].Ch());
+                else if (["Csch", "csch", "Cosech", "cosech"].includes(op.name)) op.value = new Complex(1).Div(args[0].Sh());
+                else if (["Asinh", "asinh", "Arcsinh", "arcsinh", "Ash", "ash", "Arcsh", "arcsh", "Arsh", "arsh"].includes(op.name)) op.value = args[0].Ash();
+                else if (["Acosh", "acosh", "Arccosh", "arccosh", "Ach", "ach", "Arcch", "arcch", "Arch", "arch"].includes(op.name)) op.value = args[0].Ach();
+                else if (["Atanh", "atanh", "Atgh", "atgh", "Ath", "ath", "Arctanh", "arctanh", "Arctgh", "arctgh", "Arth", "arth"].includes(op.name)) op.value = args[0].Ath();
+                else if (["Actgh", "actgh", "Arcctgh", "arcctgh", "Arctgh", "arctgh", "Arcth", "arcth", "Acth", "acth"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ath();
+                else if (["Asech", "asech", "Arcsech", "arcsech", "Arsech", "arsech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ach();
+                else if (["Acsch", "acsch", "Acosech", "acosech", "Arccsch", "arccsch", "Arccosech", "arccosech", "Arcsch", "arcsch", "Arcosech", "arcosech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ash();
+                // Fct, Def, Itg
 
                 op.relevance = true;
                 return op.value;
