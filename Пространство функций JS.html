@@ -802,8 +802,8 @@
                 // i = 0 = f(x, y)
                 // c.Re = x
                 // c.Im = y
-                i = CalculationValue(Fvalue).Abs(); //Sub(y; Sin(Mul(t; x)))
-                i = c.Sub(new Complex(0, 2)).Abs() - 2;
+                //i = CalculationValue(Fvalue).Abs(); //Sub(y; Sin(Mul(t; x)))
+                i = Min(Min(c.Abs() - 2,c.Im - c.Re * c.Re), c.Im * c.Re - 1); 
                 dt = 0.025; //скорость анимации
                 if (c.Re > sx - m / k && c.Re < sx + m / k && c.Im < -sy + m / k && c.Im > -sy - m / k) dist = i; //вывод расстояния до функции
             } catch { }
