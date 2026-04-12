@@ -67,12 +67,18 @@
         #label1 {
             margin-top: 10px;
         }
+
+        #button4 {
+            z-index: 2;
+            margin: 5px;
+        }
     </style>
 </head>
 <body> <!--<body onload="draw();">-->
     <!--<canvas id="drawing" width="930" height="900">Ошибка</canvas>-->
 
     <div class="container">
+        <button id="button4">Скрыть</button>
         <div class="controls">
             <div id="label1">R: 0</div>
 
@@ -441,6 +447,7 @@
         const button1 = document.getElementById('button1');
         const button2 = document.getElementById('button2');
         const button3 = document.getElementById('button3');
+        const button4 = document.getElementById('button4');
         const pictureBox1 = document.getElementById('pictureBox1');
         const richTextBox1 = document.getElementById('richTextBox1');
 
@@ -452,39 +459,33 @@
         pictureBox1.addEventListener('mouseup', (e) => {this.pictureBox1_MouseUp(e);});
         button3.addEventListener('click', () => {this.button3_Click();});
         button1.addEventListener('click', () => {this.button1_Click();});
-
         pictureBox1.addEventListener('touchstart', (e) => {this.pictureBox1_TouchDown(e);});
         pictureBox1.addEventListener('touchmove', (e) => {this.pictureBox1_TouchMove(e);});
         pictureBox1.addEventListener('touchend', (e) => {this.pictureBox1_MouseUp(e);});
         pictureBox1.addEventListener('mouseup', (e) => {this.pictureBox1_MouseUp(e);});
         pictureBox1.addEventListener('mouseleave', (e) => {this.pictureBox1_MouseUp(e);});
+        button4.addEventListener('click', () => {this.button4_Click();});
 
-        var CRe = -1;
-        var CIm = 0;
-        var Cmode = 1;
+        var CRe = -1, CIm = 0;
+        //var Cmode = 1;
         var m = 0;
-        var Lx = 0;
-        var Ly = 0;
-        var dx = 0;
-        var dy = 0;
+        var Lx = 0, Ly = 0, Lx2 = 0, Ly2 = 0;
+        var dx = 0, dy = 0, dx2 = 0, dy2 = 0;
         var k = 51;
-        var sk = k;
-        var sx = 0;
-        var sy = 0;
-        var ssx = 0;
-        var ssy = 0;
-        var x = 0;
-        var y = 0;
+        //var sk = k;
+        var sx = 0, sy = 0;
+        //var ssx = 0; //var ssy = 0;
+        var x = 0, y = 0;
         var dC = false;
-        var sn = 2;
-        var t = 0;
-        var dt = 0.1;
+        //var sn = 2;
+        var t = 0, dt = 0.1;
         var dist = 1;
         var animation = false;
         var buttontype = -1;
         var operations = [];
         var Fvalue = "";
         var timer1Interval = 1;
+        var TouchWheel = false;
 
         resizeCanvas();
         Fvalue = Recognition(String(richTextBox1.value)); //console.log(operations);
@@ -525,14 +526,14 @@
                 Ly = e.clientY - rect.top; 
             }
             
-            if (e.button === 1) { // Средняя кнопка мыши
-                // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
-                const buttonsAndLabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
-                buttonsAndLabelsIds.forEach(id => {
-                    const element = document.getElementById(id);
-                    element.style.display = element.style.display === 'none' ? '' : 'none';
-                });
-            }
+            // if (e.button === 1) { // Средняя кнопка мыши
+            //     // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
+            //     const buttonsAndLabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
+            //     buttonsAndLabelsIds.forEach(id => {
+            //         const element = document.getElementById(id);
+            //         element.style.display = element.style.display === 'none' ? '' : 'none';
+            //     });
+            // }
         }
 
         function pictureBox1_TouchDown(e) {
@@ -540,7 +541,15 @@
 
             const rect = e.target.getBoundingClientRect();
             Lx = e.touches[0].clientX - rect.left; 
-            Ly = e.touches[0].clientY - rect.top; 
+            Ly = e.touches[0].clientY - rect.top;
+
+            if(e.touches.length > 1) {
+                TouchWheel = true;
+                const rect = e.target.getBoundingClientRect();
+                Lx2 = e.touches[1].clientX - rect.left; 
+                Ly2 = e.touches[1].clientY - rect.top;
+            }
+            else TouchWheel = false;
             
             // if (e.button === 1) { // Средняя кнопка мыши
             //     // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
@@ -559,14 +568,29 @@
         function pictureBox1_MouseMove(e) {
             if (buttontype === 0) {
                 const rect = e.target.getBoundingClientRect();
-                dx = e.clientX - rect.left; 
-                dy = e.clientY - rect.top; 
-                // if (!dC && Cmode === 1)
-                sx += (Lx - dx) / k;
-                // if (!dC && Cmode === 1)
-                sy += (Ly - dy) / k;
-                if (dC) CRe += (Lx - dx) / k;
-                if (dC) CIm += (Ly - dy) / k;
+                dx = e.touches[0].clientX - rect.left; 
+                dy = e.touches[0].clientY - rect.top;
+                if(!TouchWheel) {
+                    // if (!dC && Cmode === 1)
+                    sx += (Lx - dx) / k;
+                    // if (!dC && Cmode === 1)
+                    sy += (Ly - dy) / k;
+                    if (dC) CRe += (Lx - dx) / k;
+                    if (dC) CIm += (Ly - dy) / k;
+                }
+                else {
+                    dx2 = e.touches[1].clientX - rect.left; 
+                    dy2 = e.touches[1].clientY - rect.top;
+                    // if (!dC && Cmode === 1)
+                    sx += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
+                    // if (!dC && Cmode === 1)
+                    sy += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
+                    if (dC) CRe += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
+                    if (dC) CIm += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
+                    k *= new Complex(Lx, Ly).Sub(new Complex(Lx2, Ly2)).Abs() / new Complex(dx, dy).Sub(new Complex(dx2, dy2)).Abs();
+                    Lx2 = dx2;
+                    Ly2 = dy2;
+                }
                 Lx = dx;
                 Ly = dy;
                 mReset();
@@ -1049,6 +1073,7 @@
                 if (c.Re > sx - m / k && c.Re < sx + m / k && c.Im < -sy + m / k && c.Im > -sy - m / k) dist = i; //вывод расстояния до функции
             } catch { }
             if (i == 0) return 'rgb(0, 0, 0)';
+            else if (i == Infinity) return 'rgb(255, 255, 255)';
             else {
                 i = Math.abs(i);
                 i = Math.log(i,2);
@@ -1059,8 +1084,8 @@
                     var b = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 1.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (b > 255) b = 255; if (b < 0) b = 0;
                     return `rgb(${r}, ${g}, ${b})`;
                 }
-                catch { return 'rgb(255, 0, 255)'; }
-                else { return 'rgb(255, 255, 0)'; }
+                catch { return 'rgb(255, 255, 255)'; }
+                else { return 'rgb(255, 255, 255)'; }
             }
         }
 
@@ -1069,6 +1094,10 @@
             animation = !animation;
             if(animation) timer1Interval = 70;
             else timer1Interval = 1;
+        }
+
+        function button4_Click() {
+            pictureBox1.style.zIndex = 1 - pictureBox1.style.zIndex;
         }
     </script>
 </body>
