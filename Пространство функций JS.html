@@ -45,14 +45,14 @@
             z-index: 1;
         }
 
-        .controls label {
+        .controls > label {
             display: block; /* Отображаем метки как блочные элементы */
             margin-top: 10px;
         }
 
-        .controls input,
-        .controls textarea,
-        .controls button {
+        .controls > input,
+        .controls > textarea,
+        .controls > button {
             width: 100%; /* Ширина элементов управления на всю ширину панели */
             margin-top: 5px;
         }
@@ -311,7 +311,7 @@
                 if(a.Abs() >= b.Abs()) { c1 = a; c2 = b; }
                 else { c1 = b; c2 = a; }
                 var c3 = c1.Mod(c2);
-                while (c3.Abs() > 0.00001) {
+                for (let i = 0; c3.Abs() > 0.00001 && i < 1000; i++) {
                     c1 = c2; 
                     c2 = c3; 
                     c3 = c1.Mod(c2);
@@ -577,6 +577,7 @@
                 }
             }
 
+            static Fct(a) { return new Complex(a).Fct(); }
             Fct() { //y = x^(t-1)*e^(-x)
                 const d = 0.001; var result = new Complex(0); var z = new Complex(Complex.Mod(new Complex(this.Re), 1).Re, this.Im);
                 //for(let n = d; n <= 1; n += d) result = Complex.Sub(0, Complex.Ln(n)).Pow(z).Mul(d).Sum(result); //new Complex(n).Pow(this.Sub(1)).Mul(Math.exp(-n)).Mul(dx).Sum(result);
@@ -584,28 +585,34 @@
                 const c1 = Complex.Div(Complex.Div(Complex.Pow(Math.PI, 0.5), 2).Sub(1), Complex.Mul(2, (a.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(a.Sum(1).Div(Math.E)).Pow(a.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))),a.Sub(1))).Sub(1));
                 result = Complex.Mul(2, (z.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(z.Sum(1).Div(Math.E)).Pow(z.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))), z.Sub(1))).Sub(1).Mul(c1).Sum(1);
                 var n = this.Dround().Re;
-                for(let i = 0; i < n; i++) result = this.Sub(i).Mul(result);
-                for(let i = 0; i < -n; i++) result = result.Div(this.Sum(i+1));
+                for(let i = 0; i < n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = this.Sub(i).Mul(result);
+                for(let i = 0; i < -n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = result.Div(this.Sum(i+1));
                 return result;
-            }
-            static Fct(a) {
-                const dx = 0.001; var result = new Complex(0);
-                for(let n = dx; n <= 1; n += dx) result = Complex.Sub(0, Complex.Ln(n)).Pow(Complex.Sub(a, 1)).Mul(dx).Sum(result);
-                return result;
-            }
+            } 
+            // static Fct(a) {
+            //     const dx = 0.001; var result = new Complex(0);
+            //     for(let n = dx; n <= 1; n += dx) result = Complex.Sub(0, Complex.Ln(n)).Pow(Complex.Sub(a, 1)).Mul(dx).Sum(result);
+            //     return result;
+            // }
 
+            static Tetr(a, b) { return new Complex(a).Tetr(b); }
             Tetr(b) {
                 const d = 0.001; var result = new Complex(0); var z = new Complex(this.Re, this.Im).Sub(0);
                 b = new Complex(b);
                 //for(let n = d; n <= 1; n += d) result = Complex.Sub(0, Complex.Ln(n)).Pow(z).Mul(d).Sum(result); //new Complex(n).Pow(this.Sub(1)).Mul(Math.exp(-n)).Mul(dx).Sum(result);
                 var n = b.Sub(-1).Dround().Re;
-                //b.Mod(1).Mul(Math.PI).Cos().Mul(-1).Sum(1).Div(2);
-                result = b.Mod(1).Pow(this.Ln().Pow(Complex.Div(1, z.Re))); //z.Log(z).Mul(Complex.Sub(1, b.Mod(1))).Sum(z.Mul(b.Mod(1)));
-                for(let i = 0; i < n; i++) result = this.Sub(0).Pow(result);
-                for(let i = 0; i < -n; i++) result = result.Log(this.Sum(0));
-                return result;
+                
+                //result = b.Mod(1);
+                //result = b.Mod(1).Mul(Math.PI).Cos().Mul(-1).Sum(1).Div(2);
+                result = b.Mod(1).Pow(this.Ln().Pow(Complex.Div(1, z.Re)));
+                //result = b.Mod(1).Pow(this.Log(b.Mod(1).Sum(Complex.Pow(z, b.Mod(1).Sum(z)))));
+                //result = b.Mod(1).Pow(this.Ln().Pow(Complex.Sub(Math.E * 2, Complex.Pow(z.Re, b.Mod(1).Sum(1)))));
+                //result = z.Log(z).Mul(Complex.Sub(1, b.Mod(1))).Sum(z.Mul(b.Mod(1)));
+                for(let i = 0; i < n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = this.Sub(0).Pow(result);
+                for(let i = 0; i < -n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = result.Log(this.Sum(0));
+                return result; //y = Re(tetr(t; x+0.001) - tetr(t; x))/0.001
             }
-        }
+        } //y = (cos(t)*x+sin(t)*2)^(cos(t)*2+sin(t)*x)
 
         class Operation {
             constructor(name, args, operations) {
@@ -614,12 +621,12 @@
                 this.variability = 3;
                 for(var j = 0; ((j < this.args.length) && (this.variability != 0)); j++) {
                     const arg = args[j];
-                    if (arg[0] == 'r') {
+                    if (arg[0] == 'r' && arg.length > 1) {
                         var id = ""; for (let i = 1; i < arg.length; i++) id += String(arg[i]);
                         const op = operations[Math.floor(id)];
                         if(op.variability < this.variability) this.variability = op.variability;
                     }
-                    else if (arg[0] == 'c' || arg[0] == 'y') this.variability = 0;
+                    else if (arg[0] == 'c' || arg[0] == 'y' || arg[0] == 'r' || arg[0] == 'θ') this.variability = 0;
                     else if (arg[0] == 'x') { if(1 < this.variability) this.variability = 1; }
                     else if (arg[0] == 't') if(2 < this.variability) this.variability = 2;
                     //else if (arg[0] == 'p' || arg[0] == 'e' || arg[0] == 'i') if(2 < this.variability) this.variability = 2;
@@ -720,8 +727,8 @@
             
             // if (e.button === 1) { // Средняя кнопка мыши
             //     // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
-            //     const buttonsAndLabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
-            //     buttonsAndLabelsIds.forEach(id => {
+            //     const buttonsAndlabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
+            //     buttonsAndlabelsIds.forEach(id => {
             //         const element = document.getElementById(id);
             //         element.style.display = element.style.display === 'none' ? '' : 'none';
             //     });
@@ -745,8 +752,8 @@
             
             // if (e.button === 1) { // Средняя кнопка мыши
             //     // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
-            //     const buttonsAndLabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
-            //     buttonsAndLabelsIds.forEach(id => {
+            //     const buttonsAndlabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
+            //     buttonsAndlabelsIds.forEach(id => {
             //         const element = document.getElementById(id);
             //         element.style.display = element.style.display === 'none' ? '' : 'none';
             //     });
@@ -860,7 +867,7 @@
                 }
             }
             else if (m >= 1) {
-                m = (pictureBox1.width + pictureBox1.height) / 175;
+                m = (pictureBox1.width + pictureBox1.height) / 175; //300;
                 //const bitmap2 = document.createElement('canvas'); try { bitmap2.width = window.innerWidth / m; bitmap2.height = window.innerHeight / m; } catch { bitmap2.width = 1; bitmap2.height = 1; };
                 for (var x1 = 0; x1 < window.innerWidth / m;  x1++) {
                     operations.forEach(function(op) { if(op.variability <= 1) op.relevance = false; });
@@ -887,7 +894,7 @@
         }
         function Recognition(formula) {
             formula = String(formula);
-            var multiexpression=false, And=false, Abs=false, equality=false, Sum=false, Sub=false, Mul=false, Div=false, Pow=false;
+            var multiexpression=false, And=false, Abs=false, equality=false, Sum=false, Sub=false, Mul=false, Div=false, Pow=false, Root=false, Fct=false, Mod=false;
             {
                 var level = 0, formula1 = "";
                 for (var i = 0; i < formula.length; i++) if (formula[i] != ' ') {
@@ -905,6 +912,13 @@
                     else if (formula[i] == '≡') formula1 += '=';
                     else if (formula[i] == '↔') formula1 += '=';
                     else if (formula[i] == '⇔') formula1 += '=';
+                    else if (formula[i] == '[') formula1 += "round(";
+                    else if (formula[i] == '⌊') formula1 += "Dround(";
+                    else if (formula[i] == '⌈') formula1 += "Uround(";
+                    else if (formula[i] == ']') formula1 += ')';
+                    else if (formula[i] == '⌋') formula1 += ')';
+                    else if (formula[i] == '⌉') formula1 += ')';
+                    else if (formula[i] == '⋮') formula1 += '%';
 
                     else formula1 += String(formula[i]);
                 }
@@ -919,7 +933,10 @@
                         if(!Sum && formula[i] == '-') Sub = true;
                         if(!Div && formula[i] == '*') Mul = true;
                         if(!Mul && formula[i] == '/') Div = true;
+                        if(formula[i] == '%') Mod = true;
                         if(formula[i] == '^') Pow = true;
+                        if(formula[i] == '√') Root = true;
+                        if(formula[i] == '!') Fct = true;
                         if(formula[i] == '|') Abs = true;
                         if(formula[i] == '&') And = true;
                     }
@@ -1016,6 +1033,17 @@
                 }
                 formula1 += ")";
                 formula = formula1;
+            } else if (Mod) {
+                var level = 0, formula1 = "", one = true;
+                for (var i = 0; i < formula.length; i++) {
+                    if (formula[i] == '(') level++;
+                    else if (formula[i] == ')') level--;
+                    if (level > 0 || !one || !['%', 'g', 'G'].includes(formula[i])) formula1 += formula[i];
+                    else if (i > 0 && formula[i] == '%' && (formula[i-1] == 'g' || formula[i-1] == 'G')) { formula1 = "Gmod(" + formula1 + ";"; one = false; }
+                    else if (formula[i] == '%') { formula1 = "Mod(" + formula1 + ";"; one = false; }
+                }
+                formula1 += ")";
+                formula = formula1;
             } else if (Pow) {
                 var level = 0, formula1 = "", one = true;
                 for (var i = 0; i < formula.length; i++) {
@@ -1023,6 +1051,26 @@
                     else if (formula[i] == ')') level--;
                     if (level > 0 || !one || formula[i] != '^') formula1 += formula[i];
                     else if (formula[i] == '^') { formula1 = "Pow(" + formula1 + ";"; one = false; }
+                }
+                formula1 += ")";
+                formula = formula1;
+            } else if (Root) {
+                var level = 0, formula1 = "", one = true;
+                for (var i = 0; i < formula.length; i++) {
+                    if (formula[i] == '(') level++;
+                    else if (formula[i] == ')') level--;
+                    if (level > 0 || !one || formula[i] != '√') formula1 += formula[i];
+                    else if (formula[i] == '√') { formula1 += "Sqrt("; one = false; }
+                }
+                formula1 += ")";
+                formula = formula1;
+            } else if (Fct) {
+                var level = 0, formula1 = "", one = true;
+                for (var i = 0; i < formula.length; i++) {
+                    if (formula[i] == '(') level++;
+                    else if (formula[i] == ')') level--;
+                    if (level > 0 || !one || formula[i] != '!') formula1 += formula[i];
+                    else if (formula[i] == '!') { formula1 = "Mul(Fct(" + formula1 + ");"; one = false; }
                 }
                 formula1 += ")";
                 formula = formula1;
@@ -1077,7 +1125,7 @@
         function CalculationValue(value) {
             value = String(value);
             if (value == "") return new Complex(1);
-            if (value[0] == 'r') {
+            if (value[0] == 'r' && value.length > 1) {
                 var id = ""; for (var i = 1; i < value.length; i++) id += String(value[i]);
                 const op = operations[Math.floor(id)];
                 if(op.relevance) return op.value;
@@ -1194,7 +1242,6 @@
                 op.relevance = true;
                 return op.value;
             }
-
             else if (value[0] == 'c') return c;
             else if (value[0] == 'x') return new Complex(c.Re);
             else if (value[0] == 'y') return new Complex(c.Im);
@@ -1202,6 +1249,8 @@
             else if (value[0] == 'p') return new Complex(Math.PI);
             else if (value[0] == 'e') return new Complex(Math.E);
             else if (value[0] == 'i') return new Complex(0, 1);
+            else if (value[0] == 'r') return new Complex(c.Abs());
+            else if (value[0] == 'θ') return new Complex(c.Arg());
 
             else return new Complex(parseFloat(value));
         }
