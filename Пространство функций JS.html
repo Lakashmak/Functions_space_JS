@@ -464,11 +464,37 @@
             static Log(a, b) { // log() логарифм
                 return Complex.Div(Complex.Ln(b), Complex.Ln(a));
             }
+
+            Sh() { return Complex.Div(Complex.Sub(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2); }
+            static Sh(a) {// sin() синус
+                if (typeof a == "number") { // sin() синус
+                    return new Complex(Math.sinh(a));
+                } else if (a instanceof Complex) { // sin() синус
+                    return Complex.Div(Complex.Sub(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
+                }
+            }
+            
+            Ch() { return Complex.Div(Complex.Sum(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2); }
+            static Ch(a) { // cos() косинус
+                if (typeof a == "number") { // cos() косинус
+                    return new Complex(Math.cosh(a));
+                } else if (a instanceof Complex) {// cos() косинус
+                    return Complex.Div(Complex.Sum(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
+                }
+            }
+        
+            Th() { return Complex.Div(this.Sh(), this.Ch()); }
+            static Th(a) { // tg() тангенс
+                if (typeof a == "number") { // tg() тангенс
+                    return new Complex(Math.tanh(a));
+                } else if (a instanceof Complex) { // tg() тангенс
+                    return Complex.Div(Complex.Sh(a), Complex.Ch(a));
+                }
+            }
             
             Sin() { // sin() синус
                 return Complex.Div(Complex.Sub(Complex.Pow(Math.E, this.Mul(new Complex(0, 1))), Complex.Pow(Math.E, this.Mul(new Complex(0, -1)))), new Complex(0, 2));
             }
-
             static Sin(a) {// sin() синус
                 if (typeof a == "number") { // sin() синус
                     return new Complex(Math.sin(a));
@@ -480,7 +506,6 @@
             Cos() { // cos() косинус
                 return Complex.Div(Complex.Sum(Complex.Pow(Math.E, this.Mul(new Complex(0, 1))), Complex.Pow(Math.E, this.Mul(new Complex(0, -1)))), 2);
             }
-
             static Cos(a) { // cos() косинус
                 if (typeof a == "number") { // cos() косинус
                     return new Complex(Math.cos(a));
@@ -489,10 +514,7 @@
                 }
             }
         
-            Tan() { // tg() тангенс
-                return Complex.Div(this.Sin(), this.Cos());
-            }
-
+            Tan() { return Complex.Div(this.Sin(), this.Cos()); }
             static Tan(a) { // tg() тангенс
                 if (typeof a == "number") { // tg() тангенс
                     return new Complex(Math.tan(a));
@@ -501,82 +523,7 @@
                 }
             }
 
-            Sh() { // sin() синус
-                return Complex.Div(Complex.Sub(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2);
-            }
-
-            static Sh(a) {// sin() синус
-                if (typeof a == "number") { // sin() синус
-                    return new Complex(Math.sinh(a));
-                } else if (a instanceof Complex) { // sin() синус
-                    return Complex.Div(Complex.Sub(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
-                }
-            }
-            
-            Ch() { // cos() косинус
-                return Complex.Div(Complex.Sum(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2);
-            }
-
-            static Ch(a) { // cos() косинус
-                if (typeof a == "number") { // cos() косинус
-                    return new Complex(Math.cosh(a));
-                } else if (a instanceof Complex) {// cos() косинус
-                    return Complex.Div(Complex.Sum(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
-                }
-            }
-        
-            Th() { // tg() тангенс
-                return Complex.Div(this.Sh(), this.Ch());
-            }
-
-            static Th(a) { // tg() тангенс
-                if (typeof a == "number") { // tg() тангенс
-                    return new Complex(Math.tanh(a));
-                } else if (a instanceof Complex) { // tg() тангенс
-                    return Complex.Div(Complex.Sh(a), Complex.Ch(a));
-                }
-            }
-
-            Asin() { // sin() синус
-                return Complex.Ln(this.Mul(new Complex(0, 1)).Sum(Complex.Pow(this.Mul(-1).Pow(2).Sum(1), 0.5))).Mul(new Complex(0, -1));
-            }
-
-            static Asin(a) {// sin() синус
-                if (typeof a == "number") { // sin() синус
-                    return new Complex(Math.asin(a));
-                } else if (a instanceof Complex) { // sin() синус
-                    return Complex.Ln(Complex.Mul(a, new Complex(0, 1)).Sum(Complex.Pow(Complex.Mul(a, -1).Pow(2).Sum(1), 0.5))).Mul(new Complex(0, -1));
-                }
-            }
-            
-            Acos() { // cos() косинус
-                return Complex.Sub(Math.PI / 2, this.Asin());
-            }
-
-            static Acos(a) { // cos() косинус
-                if (typeof a == "number") { // cos() косинус
-                    return new Complex(Math.acos(a));
-                } else if (a instanceof Complex) {// cos() косинус
-                    return Complex.Sub(Math.PI / 2, Complex.Asin(a));
-                }
-            }
-        
-            Atan() { // tg() тангенс
-                return Complex.Ln(this.Mul(new Complex(0, -1)).Sum(1)).Sub(Complex.Ln(this.Mul(new Complex(0, 1)).Sum(1))).Mul(0, 0.5);
-            }
-
-            static Atan(a) { // tg() тангенс
-                if (typeof a == "number") { // tg() тангенс
-                    return new Complex(Math.atan(a));
-                } else if (a instanceof Complex) { // tg() тангенс
-                    return Complex.Ln(Complex.Mul(a, new Complex(0, -1)).Sum(1)).Sub(Complex.Ln(Complex.Mul(a, new Complex(0, 1)).Sum(1))).Mul(0, 0.5);
-                }
-            }
-
-            Ash() { // sin() синус
-                return Complex.Ln(this.Sum(Complex.Pow(this.Pow(2).Sum(1), 0.5)));
-            }
-
+            Ash() { return Complex.Ln(this.Sum(Complex.Pow(this.Pow(2).Sum(1), 0.5))); }
             static Ash(a) {// sin() синус
                 if (typeof a == "number") { // sin() синус
                     return new Complex(Math.asinh(a));
@@ -585,27 +532,48 @@
                 }
             }
             
-            Ach() { // cos() косинус
-                return Complex.Acos(this.Mul(new Complex(0, -1))).Mul(new Complex(0, 1));
-            }
-
+            Ach() {  return Complex.Ln(this.Sum(Complex.Pow(this.Pow(2).Sub(1), 0.5))).Mul(this.Sign()).Mul(this.Sum(1).Sign()); }
             static Ach(a) { // cos() косинус
                 if (typeof a == "number") { // cos() косинус
                     return new Complex(Math.acosh(a));
                 } else if (a instanceof Complex) {// cos() косинус
-                    return Complex.Acos(Complex.Mul(a, new Complex(0, -1))).Mul(new Complex(0, 1));
+                    return Complex.Ln(Complex.Sum(a, Complex.Pow(Complex.Pow(a, 2).Sub(1), 0.5))).Mul(a.Sign()).Mul(a.Sum(1).Sign());
                 }
             }
         
-            Ath() { // tg() тангенс
-                return Complex.Atan(this.Mul(new Complex(0, -1))).Mul(new Complex(0, 1));
-            }
-
+            Ath() { return this.Sub(1).Mul(-1).Ln().Sub(this.Sum(1).Ln()).Div(-2); }
             static Ath(a) { // tg() тангенс
                 if (typeof a == "number") { // tg() тангенс
                     return new Complex(Math.atanh(a));
                 } else if (a instanceof Complex) { // tg() тангенс
-                    return Complex.Atan(Complex.Mul(a, new Complex(0, -1))).Mul(new Complex(0, 1));
+                    return Sub(1, a).Ln().Sub(Sum(1, a).Ln()).Div(-2);
+                }
+            }
+
+            Asin() { return this.Mul(new Complex(0, 1)).Ash().Div(new Complex(0, 1)); }
+            static Asin(a) {// sin() синус
+                if (typeof a == "number") { // sin() синус
+                    return new Complex(Math.asin(a));
+                } else if (a instanceof Complex) { // sin() синус
+                    return a.Mul(new Complex(0, 1)).Ash().Div(new Complex(0, 1));
+                }
+            }
+            
+            Acos() { return this.Ach().Div(new Complex(0, 1)); }
+            static Acos(a) { // cos() косинус
+                if (typeof a == "number") { // cos() косинус
+                    return new Complex(Math.acos(a));
+                } else if (a instanceof Complex) {// cos() косинус
+                    return a.Mul(new Complex(0, 1)).Ach().Div(new Complex(0, 1));
+                }
+            }
+        
+            Atan() { return this.Mul(new Complex(0, 1)).Ath().Div(new Complex(0, 1)); }
+            static Atan(a) { // tg() тангенс
+                if (typeof a == "number") { // tg() тангенс
+                    return new Complex(Math.atan(a));
+                } else if (a instanceof Complex) { // tg() тангенс
+                    return a.Mul(new Complex(0, 1)).Ath().Div(new Complex(0, 1));
                 }
             }
         }
