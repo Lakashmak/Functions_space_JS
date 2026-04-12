@@ -576,6 +576,23 @@
                     return a.Mul(new Complex(0, 1)).Ath().Div(new Complex(0, 1));
                 }
             }
+
+            Fct() { //y = x^(t-1)*e^(-x)
+                const d = 0.001; var result = new Complex(0); var z = new Complex(Complex.Mod(new Complex(this.Re), 1).Re, this.Im);
+                //for(let n = d; n <= 1; n += d) result = Complex.Sub(0, Complex.Ln(n)).Pow(z).Mul(d).Sum(result); //new Complex(n).Pow(this.Sub(1)).Mul(Math.exp(-n)).Mul(dx).Sum(result);
+                const a = new Complex(0.5);
+                const c1 = Complex.Div(Complex.Div(Complex.Pow(Math.PI, 0.5), 2).Sub(1), Complex.Mul(2, (a.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(a.Sum(1).Div(Math.E)).Pow(a.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))),a.Sub(1))).Sub(1));
+                result = Complex.Mul(2, (z.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(z.Sum(1).Div(Math.E)).Pow(z.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))), z.Sub(1))).Sub(1).Mul(c1).Sum(1);
+                var n = this.Dround().Re;
+                for(let i = 0; i < n; i++) result = this.Sub(i).Mul(result);
+                for(let i = 0; i < -n; i++) result = result.Div(this.Sum(i+1));
+                return result;
+            }
+            static Fct(a) {
+                const dx = 0.001; var result = new Complex(0);
+                for(let n = dx; n <= 1; n += dx) result = Complex.Sub(0, Complex.Ln(n)).Pow(Complex.Sub(a, 1)).Mul(dx).Sum(result);
+                return result;
+            }
         }
 
         class Operation {
@@ -1157,7 +1174,8 @@
                 else if (["Actgh", "actgh", "Arcctgh", "arcctgh", "Arctgh", "arctgh", "Arcth", "arcth", "Acth", "acth"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ath();
                 else if (["Asech", "asech", "Arcsech", "arcsech", "Arsech", "arsech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ach();
                 else if (["Acsch", "acsch", "Acosech", "acosech", "Arccsch", "arccsch", "Arccosech", "arccosech", "Arcsch", "arcsch", "Arcosech", "arcosech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ash();
-                // Fct, Def, Itg
+                else if (op.name == "Fct" || op.name == "fct") op.value = args[0].Fct();
+                //Def, Itg
 
                 op.relevance = true;
                 return op.value;
