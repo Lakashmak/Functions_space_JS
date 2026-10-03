@@ -1,0 +1,75 @@
+/* #drawing
+{
+    border: 1px solid black;
+    /*background: #ffe;*//*
+    display: block;
+    margin: 0 auto;
+} */
+/* body {
+    font-family: Arial, sans-serif;
+    background-color: #282c34;
+    color: white;
+}
+canvas {
+    border: 1px solid white;
+}
+.controls {
+    margin-bottom: 10px;
+} */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0; /* Цвет фона страницы */
+    margin: 0;
+    overscroll-behavior: none;
+}
+
+.container {
+    display: flex; /* Используем flexbox для размещения элементов */
+}
+
+.controls {
+    position: absolute;
+    width: 190px; /* Ширина панели управления */
+    padding: 15px;
+    /*background-color: #ffffff; /* Цвет фона панели */
+    /*border-right: 2px solid #ccc; /* Разделительная линия */
+    z-index: 1;
+}
+
+.controls > label {
+    display: block; /* Отображаем метки как блочные элементы */
+    margin-top: 10px;
+}
+
+.controls > input,
+.controls > textarea,
+.controls > button {
+    width: 100%; /* Ширина элементов управления на всю ширину панели */
+    margin-top: 5px;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    flex-grow: 1; /* Канвас занимает оставшееся пространство */
+    /*background-color: #ffffff; /* Цвет фона канваса */
+}
+
+#label1 {
+    margin-top: 10px;
+    background-color: white;
+    font-size: 10pt;
+}
+
+label {
+    background-color: white;
+    font-size: 10pt;
+    width: fit-content;
+}
+
+#button4 {
+    z-index: 2;
+    margin: 5px;
+}

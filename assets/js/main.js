@@ -1,0 +1,1295 @@
+class Complex {
+    constructor(Re, Im) {
+        if (arguments.length === 1 && typeof Re === 'object') { // Если передан объект Complex
+            this.Re = Re.Re;
+            this.Im = Re.Im;
+        } else if (arguments.length === 2) { // Если переданы два числа
+            this.Re = Re;
+            this.Im = Im;
+        } else if (arguments.length === 1 && typeof Re === 'number') { // Если передано одно число
+            this.Re = Re;
+            this.Im = 0;
+        } else {
+            throw new Error('Invalid arguments');
+        }
+    }
+
+    Round() { return new Complex(Math.round(this.Re), Math.round(this.Im)); } 
+    static Round(a) {
+        if(typeof a == "number") {
+            return Math.round(a);
+        } else if (a instanceof Complex) {
+            return new Complex(Math.round(a.Re), Math.round(a.Im));
+        }
+    }
+
+    Uround() { return new Complex(Math.ceil(this.Re), Math.ceil(this.Im)); }
+    static Uround(a) {
+        if(typeof a == "number") {
+            return Math.ceil(a);
+        } else if (a instanceof Complex) {
+            return new Complex(Math.ceil(a.Re), Math.ceil(a.Im));
+        }
+    }
+
+    Dround() { return new Complex(Math.floor(this.Re), Math.floor(this.Im)); }
+    static Dround(a) {
+        if(typeof a == "number") {
+            return Math.floor(a);
+        } else if (a instanceof Complex) {
+            return new Complex(Math.floor(a.Re), Math.floor(a.Im));
+        }
+    }
+
+    Abs() { return Math.sqrt(this.Re * this.Re + this.Im * this.Im); }
+    static Abs(a) { // |z| модуль (абсолютное значение)
+        if (typeof a === 'number') {
+            return Math.abs(a);
+        } else if (a instanceof Complex) {
+            return Math.sqrt(a.Re * a.Re + a.Im * a.Im);
+        }
+        throw new Error('Invalid argument');
+    }
+
+    Sign() { // sign(z) направление
+        if (this.Re === 0 && this.Im === 0) return new Complex(1);
+        else return new Complex(this.Re, this.Im).Div(new Complex(this.Re, this.Im).Abs());
+    }
+
+    static Sign(a) { // sign(z) направление
+        if (typeof a === 'number') {
+            return a === 0 ? 1 : Math.sign(a);
+        } else if (a instanceof Complex) {
+            if (a.Re === 0 && a.Im === 0) return new Complex(1);
+            else return a.Div(a.Abs());
+        }
+        throw new Error('Invalid argument');
+    }
+
+    Conj() { // conj(z) комплексносопряжённое (Re(z) - Im(z))
+        return new Complex(this.Re, -this.Im);
+    }
+
+    static Conj(a) { // conj(z) комплексносопряжённое (Re(z) - Im(z))
+        if (typeof a === 'number') {
+            return new Complex(a);
+        } else if (a instanceof Complex) {
+            return new Complex(a.Re, -a.Im);
+        }
+        throw new Error('Invalid argument');
+    }
+
+    Sum(b) { // + сложение
+        if (typeof b === 'number') {
+            return new Complex((this.Re + b), this.Im);
+        } else if (b instanceof Complex) {
+            return new Complex((this.Re + b.Re), (this.Im + b.Im));
+        }
+        throw new Error('Invalid argument');
+    }
+
+    static Sum(a, b) { // + сложение
+        if (typeof a === 'number' && typeof b === 'number') {
+            return a + b;
+        } else if (a instanceof Complex && typeof b === 'number') {
+            return new Complex((a.Re + b), a.Im);
+        } else if (typeof a === 'number' && b instanceof Complex) {
+            return new Complex((a + b.Re), b.Im);
+        } else if (a instanceof Complex && b instanceof Complex) {
+            return new Complex((a.Re + b.Re), (a.Im + b.Im));
+        }
+        throw new Error('Invalid arguments');
+    }
+
+    Sub(b) { // - вычитание
+        if (typeof b === 'number') {
+            return new Complex((this.Re - b), this.Im);
+        } else if (b instanceof Complex) {
+            return new Complex((this.Re - b.Re), (this.Im - b.Im));
+        }
+        throw new Error('Invalid argument');
+    }
+
+    static Sub(a, b) { // - вычитание
+        if (typeof a === 'number' && typeof b === 'number') {
+            return a - b;
+        } else if (a instanceof Complex && typeof b === 'number') {
+            return new Complex((a.Re - b), a.Im);
+        } else if (typeof a === 'number' && b instanceof Complex) {
+            return new Complex((a - b.Re), -b.Im);
+        } else if (a instanceof Complex && b instanceof Complex) {
+            return new Complex((a.Re - b.Re), (a.Im - b.Im));
+        }
+        throw new Error('Invalid arguments');
+    }
+
+    Mul(b) { // * умножение
+        if (typeof b === 'number') {
+            return new Complex((this.Re * b), (this.Im * b));
+        } else if (b instanceof Complex) {
+            return new Complex((this.Re * b.Re - this.Im * b.Im), (this.Re * b.Im + this.Im * b.Re));
+        }
+        throw new Error('Invalid argument');
+    }
+    
+    static Mul(a, b) { // * умножение
+        if (typeof a === 'number' && typeof b === 'number') {
+            return a * b;
+        } else if (a instanceof Complex && typeof b === 'number') {
+            return new Complex((a.Re * b), (a.Im * b));
+        } else if (typeof a === 'number' && b instanceof Complex) {
+            return new Complex((a * b.Re), (a * b.Im));
+        } else if (a instanceof Complex && b instanceof Complex) {
+            return new Complex((a.Re * b.Re - a.Im * b.Im), (a.Re * b.Im + a.Im * b.Re));
+        }
+        throw new Error('Invalid arguments');
+    }
+
+    Div(b) { // / деление
+        if (typeof b === 'number') {
+            return new Complex((this.Re / b), (this.Im / b));
+        } else if (b instanceof Complex) {
+            const c = this.Mul(b.Conj());
+            const denominator = (b.Re * b.Re + b.Im * b.Im);
+            return new Complex((c.Re / denominator), (c.Im / denominator));
+        }
+        throw new Error('Invalid argument');
+    }
+
+    static Div(a, b) { // / деление
+        if (typeof a === 'number' && typeof b === 'number') {
+            return a / b;
+        } else if (a instanceof Complex && typeof b === 'number') {
+            return new Complex((a.Re / b), (a.Im / b));
+        } else if (typeof a === 'number' && b instanceof Complex) {
+            const c = a * b.Conj();
+            const denominator = (b.Re * b.Re + b.Im * b.Im);
+            return new Complex((c / denominator), 0); // Упрощаем для случая с числом
+        } else if (a instanceof Complex && b instanceof Complex) {
+            const c = a.Mul(b.Conj());
+            const denominator = (b.Re * b.Re + b.Im * b.Im);
+            return new Complex((c.Re / denominator), (c.Im / denominator));
+        }
+        throw new Error('Invalid arguments');
+    }
+
+    Mod(b) { return this.Sub(Complex.Dround(this.Div(b)).Mul(b)); }
+    static Mod(a, b) {
+        if(typeof a == "number" && typeof b == "number") {
+            return a % b;
+        } else if (a instanceof Complex || b instanceof Complex ) {
+            return a.Sub(Complex.Dround(a.Div(b)).Mul(b));
+        }
+    }
+
+    Gmod(b) { return this.Sub(Complex.Round(this.Div(b)).Mul(b)); }
+    static Gmod(a, b) { return Complex.Sub(a, Complex.Round(Complex.Div(a, b)).Mul(b)); }
+
+    Gcd(b) { var a = new Complex(this.Re, this.Im); return Complex.Gcd(a, b); }
+    static Gcd(a, b) {
+        if(Complex.Abs(a) == 0 && Complex.Abs(b) == 0) return new Complex(0);
+        if(Complex.Abs(a) == 0) return b;
+        if(Complex.Abs(b) == 0) return a;
+        var c1, c2;
+        if(a.Abs() >= b.Abs()) { c1 = a; c2 = b; }
+        else { c1 = b; c2 = a; }
+        var c3 = c1.Mod(c2);
+        for (let i = 0; c3.Abs() > 0.00001 && i < 1000; i++) {
+            c1 = c2; 
+            c2 = c3; 
+            c3 = c1.Mod(c2);
+        }
+        return new Complex(c2);
+    }
+
+    Lcm(b) { var a = new Complex(this.Re, this.Im); return Complex.Lcm(a, b); }
+    static Lcm(a, b) { return a.Mul(b).Div(a.Gcd(b)); }
+
+    Arg() { // угол направления числа
+        return Math.acos(this.Sign().Re) * Complex.Sign(Math.asin(this.Sign().Im));
+    }
+
+    static Arg(a) { // угол направления числа
+        if(typeof a == "number") 
+            return Math.acos(Complex.Sign(a));
+        else 
+            return Math.acos(Complex.Sign(a).Re) * Complex.Sign(Math.asin(Complex.Sign(a).Im)); 
+    }
+
+    Drct() { // числовое направление угла
+        return Complex.Sum(this.Cos(), Complex.Mul(this.Sin(), new Complex(0, 1)));
+    }
+
+    static Drct(a) { // числовое направление угла
+        if(typeof a == "number") 
+            return new Complex(Math.cos(a), Math.sin(a));
+        else 
+        return Complex.Sum(Complex.Cos(a), Complex.Mul(Complex.Sin(a), new Complex(0, 1)));
+    }
+
+    Exp(b) { // ^ возведение в степень через предел
+        const d = 4.8;
+        if (Number.isInteger(Number(b))) { // ^ возведение в степень через предел
+            const a = new Complex(this.Re, this.Im);
+            var c = new Complex(1);
+            if (b >= 0) for (var i = 0; i < b; i++) c = c.Mul(a);
+            else for (var i = 0; i < -b; i++) c = c.Div(a);
+            return c;
+        } else if (typeof b == "number") { // ^ возведение в степень через предел
+            const a = new Complex(this.Re, this.Im);
+            const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
+            const c2 = Complex.Sum(1, Complex.Mul(b, Complex.Sub(c1, 1)));
+            const c3 = Complex.Mul(Math.pow(Complex.Abs(c2), Math.pow(10, d)), Complex.Drct(Complex.Arg(c2) * Math.pow(10, d)));
+            return c3;
+        } else if (b instanceof Complex) { // ^ возведение в степень через предел
+            const a = new Complex(this.Re, this.Im);
+            const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
+            const c2 = Complex.Sum(1, Complex.Mul(b, Complex.Sub(c1, 1)));
+            const c3 = Complex.Mul(Math.pow(Complex.Abs(c2), Math.pow(10, d)), Complex.Drct(Complex.Arg(c2) * Math.pow(10, d)));
+            return c3;
+        }
+    }
+
+    static Exp(a, b) {
+        const d = 4.8;
+        if (a instanceof Complex && isInteger(b)) { // ^ возведение в степень через предел
+            var c = new Complex(1);
+            if (b >= 0) for (var i = 0; i < b; i++) c = c.Mul(a);
+            else for (var i = 0; i < -b; i++) c = c.Div(a);
+            return c;
+        } else if (typeof a == "number" && typeof b == "number") { // ^ возведение в степень через предел
+            const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(new Complex(a)) * Math.pow(0.1, d)));
+            const c2 = Complex.Sum(1, Complex.Mul(b, Complex.Sub(c1, 1)));
+            const c3 = Complex.Mul(Math.pow(Complex.Abs(c2), Math.pow(10, d)), Complex.Drct(Complex.Arg(c2) * Math.pow(10, d)));
+            return c3;
+        } else if (typeof a == "number" && b instanceof Complex) { // ^ возведение в степень через предел
+            const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(new Complex(a)) * Math.pow(0.1, d)));
+            const c2 = Complex.Sum(1, Complex.Mul(b, Complex.Sub(c1, 1)));
+            const c3 = Complex.Mul(Math.pow(Complex.Abs(c2), Math.pow(10, d)), Complex.Drct(Complex.Arg(c2) * Math.pow(10, d)));
+            return c3;
+        } else if (a instanceof Complex && typeof b == "number") { // ^ возведение в степень через предел
+            const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
+            const c2 = Complex.Sum(1, Complex.Mul(b, Complex.Sub(c1, 1)));
+            const c3 = Complex.Mul(Math.pow(Complex.Abs(c2), Math.pow(10, d)), Complex.Drct(Complex.Arg(c2) * Math.pow(10, d)));
+            return c3;
+        } else if (a instanceof Complex && b instanceof Complex) {// ^ возведение в степень через предел
+            const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
+            const c2 = Complex.Sum(1, Complex.Mul(b, Complex.Sub(c1, 1)));
+            const c3 = Complex.Mul(Math.pow(Complex.Abs(c2), Math.pow(10, d)), Complex.Drct(Complex.Arg(c2) * Math.pow(10, d)));
+            return c3;
+        }
+    }
+
+    Pow(b) { // ^ возведение в степень
+        if (typeof b == "number") { // ^ возведение в степень
+            const c1 = Math.pow(this.Abs(), b);
+            const c2 = Complex.Drct(this.Arg() * b);
+            return Complex.Mul(c1, c2);
+        } else if (b instanceof Complex) { // ^ возведение в степень
+            const c1 = Math.pow(this.Abs(), b.Re);
+            const c2 = Complex.Drct(this.Arg() * b.Re);
+            const c3 = Complex.Drct(Math.log(this.Abs()) * b.Im);
+            const c4 = Math.pow(Math.E, -b.Im * this.Arg());
+            if (this.Re == 0 && this.Im == 0) return new Complex(0);
+            else return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
+        }
+    }
+    
+    static Pow(a, b) { // ^ возведение в степень
+        if (typeof a == "number" && typeof b == "number") { // ^ возведение в степень
+            const c1 = Math.pow(Complex.Abs(a), b);
+            const c2 = Complex.Drct(Complex.Arg(a) * b);
+            return Complex.Mul(c1, c2);
+        } else if (typeof a == "number" && b instanceof Complex) { // ^ возведение в степень
+            const c1 = Math.pow(a, b.Re);
+            const c2 = Complex.Drct(Complex.Arg(a) * b.Re);
+            const c3 = Complex.Drct(Math.log(Complex.Abs(a)) * b.Im);
+            const c4 = Math.pow(Math.E, -(b.Im) * Complex.Arg(a));
+            if (a == 0) return new Complex(0);
+            else return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
+        } else if (a instanceof Complex && typeof b == "number") { // ^ возведение в степень
+            const c1 = Math.pow(a.Abs(), b);
+            const c2 = Complex.Drct(a.Arg() * b);
+            return Complex.Mul(c1, c2);
+        } else if (a instanceof Complex && b instanceof Complex) { // ^ возведение в степень
+            const c1 = Math.pow(a.Abs(), b.Re);
+            const c2 = Complex.Drct(a.Arg() * b.Re);
+            const c3 = Complex.Drct(Math.log(a.Abs()) * b.Im);
+            const c4 = Math.pow(Math.E, -b.Im * a.Arg());
+            if (a.Re == 0 && a.Im == 0) return new Complex(0);
+            else return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
+        }
+    }
+    
+    Ln() { // ln() натуральный логарифм через предел
+        // const d = 4.8;
+        // const c1 = Complex.Mul(Math.pow(this.Abs(), Math.pow(0.1, d)), Complex.Drct(this.Arg() * Math.pow(0.1, d)));
+        // const c2 = Complex.Mul(Math.pow(10, d), Complex.Sub(c1, 1));
+        return new Complex(Math.log(this.Abs()), this.Arg());
+    }
+
+    static Ln(a) {
+        // const d = 4.8;
+        // if (typeof a == "number") { // ln() натуральный логарифм через предел
+        //     return new Complex(Math.log(a));
+        // } else if (a instanceof Complex) { // ln() натуральный логарифм через предел
+        //     const c1 = Complex.Mul(Math.pow(Complex.Abs(a), Math.pow(0.1, d)), Complex.Drct(Complex.Arg(a) * Math.pow(0.1, d)));
+        //     const c2 = Complex.Mul(Math.pow(10, d), Complex.Sub(c1, 1));
+        //     return c2;
+        // }
+        return new Complex(Math.log(Complex.Abs(a)), Complex.Arg(a));
+    }
+
+    Log(a){ // log() логарифм
+        return Complex.Div(this.Ln(), Complex.Ln(a));
+    }
+
+    static Log(a, b) { // log() логарифм
+        return Complex.Div(Complex.Ln(b), Complex.Ln(a));
+    }
+
+    Sh() { return Complex.Div(Complex.Sub(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2); }
+    static Sh(a) {// sin() синус
+        if (typeof a == "number") { // sin() синус
+            return new Complex(Math.sinh(a));
+        } else if (a instanceof Complex) { // sin() синус
+            return Complex.Div(Complex.Sub(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
+        }
+    }
+    
+    Ch() { return Complex.Div(Complex.Sum(Complex.Pow(Math.E, this), Complex.Pow(Math.E, this.Mul(new Complex(-1, 0)))), 2); }
+    static Ch(a) { // cos() косинус
+        if (typeof a == "number") { // cos() косинус
+            return new Complex(Math.cosh(a));
+        } else if (a instanceof Complex) {// cos() косинус
+            return Complex.Div(Complex.Sum(Complex.Pow(Math.E, a), Complex.Pow(Math.E, Complex.Mul(a, new Complex(-1, 0)))), 2);
+        }
+    }
+
+    Th() { return Complex.Div(this.Sh(), this.Ch()); }
+    static Th(a) { // tg() тангенс
+        if (typeof a == "number") { // tg() тангенс
+            return new Complex(Math.tanh(a));
+        } else if (a instanceof Complex) { // tg() тангенс
+            return Complex.Div(Complex.Sh(a), Complex.Ch(a));
+        }
+    }
+    
+    Sin() { // sin() синус
+        return Complex.Div(Complex.Sub(Complex.Pow(Math.E, this.Mul(new Complex(0, 1))), Complex.Pow(Math.E, this.Mul(new Complex(0, -1)))), new Complex(0, 2));
+    }
+    static Sin(a) {// sin() синус
+        if (typeof a == "number") { // sin() синус
+            return new Complex(Math.sin(a));
+        } else if (a instanceof Complex) { // sin() синус
+            return Complex.Div(Complex.Sub(Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, 1))), Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, -1)))), new Complex(0, 2));
+        }
+    }
+    
+    Cos() { // cos() косинус
+        return Complex.Div(Complex.Sum(Complex.Pow(Math.E, this.Mul(new Complex(0, 1))), Complex.Pow(Math.E, this.Mul(new Complex(0, -1)))), 2);
+    }
+    static Cos(a) { // cos() косинус
+        if (typeof a == "number") { // cos() косинус
+            return new Complex(Math.cos(a));
+        } else if (a instanceof Complex) {// cos() косинус
+            return Complex.Div(Complex.Sum(Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, 1))), Complex.Pow(Math.E, Complex.Mul(a, new Complex(0, -1)))), 2);
+        }
+    }
+
+    Tan() { return Complex.Div(this.Sin(), this.Cos()); }
+    static Tan(a) { // tg() тангенс
+        if (typeof a == "number") { // tg() тангенс
+            return new Complex(Math.tan(a));
+        } else if (a instanceof Complex) { // tg() тангенс
+            return Complex.Div(Complex.Sin(a), Complex.Cos(a));
+        }
+    }
+
+    Ash() { return Complex.Ln(this.Sum(Complex.Pow(this.Pow(2).Sum(1), 0.5))); }
+    static Ash(a) {// sin() синус
+        if (typeof a == "number") { // sin() синус
+            return new Complex(Math.asinh(a));
+        } else if (a instanceof Complex) { // sin() синус
+            return Complex.Ln(Complex.Sum(a, Complex.Pow(Complex.Pow(a, 2).Sum(1), 0.5)));
+        }
+    }
+    
+    Ach() {  return Complex.Ln(this.Sum(Complex.Pow(this.Pow(2).Sub(1), 0.5))).Mul(this.Sign()).Mul(this.Sum(1).Sign()); }
+    static Ach(a) { // cos() косинус
+        if (typeof a == "number") { // cos() косинус
+            return new Complex(Math.acosh(a));
+        } else if (a instanceof Complex) {// cos() косинус
+            return Complex.Ln(Complex.Sum(a, Complex.Pow(Complex.Pow(a, 2).Sub(1), 0.5))).Mul(a.Sign()).Mul(a.Sum(1).Sign());
+        }
+    }
+
+    Ath() { return this.Sub(1).Mul(-1).Ln().Sub(this.Sum(1).Ln()).Div(-2); }
+    static Ath(a) { // tg() тангенс
+        if (typeof a == "number") { // tg() тангенс
+            return new Complex(Math.atanh(a));
+        } else if (a instanceof Complex) { // tg() тангенс
+            return Sub(1, a).Ln().Sub(Sum(1, a).Ln()).Div(-2);
+        }
+    }
+
+    Asin() { return this.Mul(new Complex(0, 1)).Ash().Div(new Complex(0, 1)); }
+    static Asin(a) {// sin() синус
+        if (typeof a == "number") { // sin() синус
+            return new Complex(Math.asin(a));
+        } else if (a instanceof Complex) { // sin() синус
+            return a.Mul(new Complex(0, 1)).Ash().Div(new Complex(0, 1));
+        }
+    }
+    
+    Acos() { return this.Ach().Div(new Complex(0, 1)); }
+    static Acos(a) { // cos() косинус
+        if (typeof a == "number") { // cos() косинус
+            return new Complex(Math.acos(a));
+        } else if (a instanceof Complex) {// cos() косинус
+            return a.Mul(new Complex(0, 1)).Ach().Div(new Complex(0, 1));
+        }
+    }
+
+    Atan() { return this.Mul(new Complex(0, 1)).Ath().Div(new Complex(0, 1)); }
+    static Atan(a) { // tg() тангенс
+        if (typeof a == "number") { // tg() тангенс
+            return new Complex(Math.atan(a));
+        } else if (a instanceof Complex) { // tg() тангенс
+            return a.Mul(new Complex(0, 1)).Ath().Div(new Complex(0, 1));
+        }
+    }
+
+    static Fct(a) { return new Complex(a).Fct(); }
+    Fct() { //y = x^(t-1)*e^(-x)
+        const d = 0.001; var result = new Complex(0); var z = new Complex(Complex.Mod(new Complex(this.Re), 1).Re, this.Im);
+        //for(let n = d; n <= 1; n += d) result = Complex.Sub(0, Complex.Ln(n)).Pow(z).Mul(d).Sum(result); //new Complex(n).Pow(this.Sub(1)).Mul(Math.exp(-n)).Mul(dx).Sum(result);
+        const a = new Complex(0.5);
+        const c1 = Complex.Div(Complex.Div(Complex.Pow(Math.PI, 0.5), 2).Sub(1), Complex.Mul(2, (a.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(a.Sum(1).Div(Math.E)).Pow(a.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))),a.Sub(1))).Sub(1));
+        result = Complex.Mul(2, (z.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(z.Sum(1).Div(Math.E)).Pow(z.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))), z.Sub(1))).Sub(1).Mul(c1).Sum(1);
+        var n = this.Dround().Re;
+        for(let i = 0; i < n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = this.Sub(i).Mul(result);
+        for(let i = 0; i < -n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = result.Div(this.Sum(i+1));
+        return result;
+    } 
+    // static Fct(a) {
+    //     const dx = 0.001; var result = new Complex(0);
+    //     for(let n = dx; n <= 1; n += dx) result = Complex.Sub(0, Complex.Ln(n)).Pow(Complex.Sub(a, 1)).Mul(dx).Sum(result);
+    //     return result;
+    // }
+
+    static Tetr(a, b) { return new Complex(a).Tetr(b); }
+    Tetr(b) {
+        const d = 0.001; var result = new Complex(0); var z = new Complex(this.Re, this.Im).Sub(0);
+        b = new Complex(b);
+        //for(let n = d; n <= 1; n += d) result = Complex.Sub(0, Complex.Ln(n)).Pow(z).Mul(d).Sum(result); //new Complex(n).Pow(this.Sub(1)).Mul(Math.exp(-n)).Mul(dx).Sum(result);
+        var n = b.Sub(-1).Dround().Re;
+        
+        //result = b.Mod(1);
+        //result = b.Mod(1).Mul(Math.PI).Cos().Mul(-1).Sum(1).Div(2);
+        result = b.Mod(1).Pow(this.Ln().Pow(Complex.Div(1, z.Re)));
+        //result = b.Mod(1).Pow(this.Log(b.Mod(1).Sum(Complex.Pow(z, b.Mod(1).Sum(z)))));
+        //result = b.Mod(1).Pow(this.Ln().Pow(Complex.Sub(Math.E * 2, Complex.Pow(z.Re, b.Mod(1).Sum(1)))));
+        //result = z.Log(z).Mul(Complex.Sub(1, b.Mod(1))).Sum(z.Mul(b.Mod(1)));
+        for(let i = 0; i < n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = this.Sub(0).Pow(result);
+        for(let i = 0; i < -n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = result.Log(this.Sum(0));
+        return result; //y = Re(tetr(t; x+0.001) - tetr(t; x))/0.001
+    }
+} //y = (cos(t)*x+sin(t)*2)^(cos(t)*2+sin(t)*x)
+
+class Operation {
+    constructor(name, args, operations) {
+        this.name = name;
+        this.args = args;
+        this.variability = 3;
+        for(var j = 0; ((j < this.args.length) && (this.variability != 0)); j++) {
+            const arg = args[j];
+            if (arg[0] == 'r' && arg.length > 1) {
+                var id = ""; for (let i = 1; i < arg.length; i++) id += String(arg[i]);
+                const op = operations[Math.floor(id)];
+                if(op.variability < this.variability) this.variability = op.variability;
+            }
+            else if (arg[0] == 'c' || arg[0] == 'y' || arg[0] == 'r' || arg[0] == 'θ') this.variability = 0;
+            else if (arg[0] == 'x') { if(1 < this.variability) this.variability = 1; }
+            else if (arg[0] == 't') if(2 < this.variability) this.variability = 2;
+            //else if (arg[0] == 'p' || arg[0] == 'e' || arg[0] == 'i') if(2 < this.variability) this.variability = 2;
+            //else if(2 < this.variability) this.variability = 2;
+        }
+        this.relevance = false;
+        this.value = new Complex(1);
+    }
+
+    
+}
+
+const textBox1 = document.getElementById('textBox1');
+const textBox2 = document.getElementById('textBox2');
+const textBox3 = document.getElementById('textBox3');
+const textBox4 = document.getElementById('textBox4');
+const button1 = document.getElementById('button1');
+const button2 = document.getElementById('button2');
+const button3 = document.getElementById('button3');
+const button4 = document.getElementById('button4');
+const pictureBox1 = document.getElementById('pictureBox1');
+const richTextBox1 = document.getElementById('richTextBox1');
+
+window.addEventListener('resize', resizeCanvas);
+pictureBox1.addEventListener('wheel', (e) => {this.MouseWheel(e);});
+button2.addEventListener('click', () => {this.button2_Click();});
+pictureBox1.addEventListener('mousedown', (e) => {this.pictureBox1_MouseDown(e);});
+pictureBox1.addEventListener('mousemove', (e) => {this.pictureBox1_MouseMove(e);});
+pictureBox1.addEventListener('mouseup', (e) => {this.pictureBox1_MouseUp(e);});
+button3.addEventListener('click', () => {this.button3_Click();});
+button1.addEventListener('click', () => {this.button1_Click();});
+pictureBox1.addEventListener('touchstart', (e) => {this.pictureBox1_TouchDown(e);});
+pictureBox1.addEventListener('touchmove', (e) => {this.pictureBox1_TouchMove(e);});
+pictureBox1.addEventListener('touchend', (e) => {this.pictureBox1_MouseUp(e);});
+pictureBox1.addEventListener('mouseup', (e) => {this.pictureBox1_MouseUp(e);});
+pictureBox1.addEventListener('mouseleave', (e) => {this.pictureBox1_MouseUp(e);});
+button4.addEventListener('click', () => {this.button4_Click();});
+
+var CRe = -1, CIm = 0;
+//var Cmode = 1;
+var m = 0;
+var Lx = 0, Ly = 0, Lx2 = 0, Ly2 = 0;
+var dx = 0, dy = 0, dx2 = 0, dy2 = 0;
+var k = 51;
+//var sk = k;
+var sx = 0, sy = 0;
+//var ssx = 0; //var ssy = 0;
+var x = 0, y = 0;
+var dC = false;
+//var sn = 2;
+var t = 0, dt = 0.1;
+var dist = 1;
+var animation = false;
+var buttontype = -1;
+var operations = [];
+var Fvalue = "";
+var timer1Interval = 1;
+var TouchWheel = false;
+
+resizeCanvas();
+Fvalue = Recognition(String(richTextBox1.value)); //console.log(operations);
+gr = pictureBox1.getContext('2d');
+gr.fillStyle = 'rgb(255, 127, 0)';
+gr.clearRect(0, 0, pictureBox1.width, pictureBox1.height); //gr.clearRect(0, 0, 930, 900);
+setInterval(timer1_Tick, timer1Interval);
+//requestAnimationFrame(this.Draw.bind(this));
+
+function resizeCanvas() {
+    pictureBox1.width = window.innerWidth;
+    pictureBox1.height = window.innerHeight;
+    gr = pictureBox1.getContext('2d');
+    mReset();
+}
+
+function MouseWheel(e) {
+    if (e.deltaY < 0) k *= 1.35;
+    else k /= 1.35;
+    textBox1.value = 255 / k;
+    mReset();
+}
+
+function button2_Click() {
+    k = 255 / parseFloat(textBox1.value);
+    sx = parseFloat(textBox2.value)
+    sy = -parseFloat(textBox3.value);
+    t = parseFloat(textBox4.value);
+    mReset();
+}
+
+function pictureBox1_MouseDown(e) {
+    buttontype = e.button
+
+    if (e.button === 0) { // Левая кнопка мыши
+        const rect = e.target.getBoundingClientRect();
+        Lx = e.clientX - rect.left; 
+        Ly = e.clientY - rect.top; 
+    }
+    
+    // if (e.button === 1) { // Средняя кнопка мыши
+    //     // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
+    //     const buttonsAndlabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
+    //     buttonsAndlabelsIds.forEach(id => {
+    //         const element = document.getElementById(id);
+    //         element.style.display = element.style.display === 'none' ? '' : 'none';
+    //     });
+    // }
+}
+
+function pictureBox1_TouchDown(e) {
+    buttontype = 0;
+
+    const rect = e.target.getBoundingClientRect();
+    Lx = e.touches[0].clientX - rect.left; 
+    Ly = e.touches[0].clientY - rect.top;
+
+    if(e.touches.length > 1) {
+        TouchWheel = true;
+        const rect = e.target.getBoundingClientRect();
+        Lx2 = e.touches[1].clientX - rect.left; 
+        Ly2 = e.touches[1].clientY - rect.top;
+    }
+    else TouchWheel = false;
+    
+    // if (e.button === 1) { // Средняя кнопка мыши
+    //     // Переключение видимости кнопок и меток (можно адаптировать под ваши элементы)
+    //     const buttonsAndlabelsIds = ['button1', 'button2', 'button3', 'label1', 'label2', 'label3', 'label4', 'label5', 'textBox1', 'textBox2', 'textBox3', 'textBox4', 'richTextBox1'];
+    //     buttonsAndlabelsIds.forEach(id => {
+    //         const element = document.getElementById(id);
+    //         element.style.display = element.style.display === 'none' ? '' : 'none';
+    //     });
+    // }
+}
+
+function pictureBox1_MouseUp(e){
+    buttontype = -1;
+}
+
+function pictureBox1_MouseMove(e) {
+    if (buttontype === 0) {
+        const rect = e.target.getBoundingClientRect();
+        dx = e.clientX - rect.left; 
+        dy = e.clientY - rect.top; 
+        // if (!dC && Cmode === 1)
+        sx += (Lx - dx) / k;
+        // if (!dC && Cmode === 1)
+        sy += (Ly - dy) / k;
+        if (dC) CRe += (Lx - dx) / k;
+        if (dC) CIm += (Ly - dy) / k;
+        Lx = dx;
+        Ly = dy;
+        mReset();
+        textBox2.value = sx; 
+        textBox3.value = -sy;
+    }
+}
+
+function pictureBox1_TouchMove(e) {
+    //e.preventDefault();
+    if (buttontype === 0) {
+        const rect = e.target.getBoundingClientRect();
+        dx = e.touches[0].clientX - rect.left; 
+        dy = e.touches[0].clientY - rect.top;
+        if(!TouchWheel) {
+            // if (!dC && Cmode === 1)
+            sx += (Lx - dx) / k;
+            // if (!dC && Cmode === 1)
+            sy += (Ly - dy) / k;
+            if (dC) CRe += (Lx - dx) / k;
+            if (dC) CIm += (Ly - dy) / k;
+        }
+        else {
+            dx2 = e.touches[1].clientX - rect.left; 
+            dy2 = e.touches[1].clientY - rect.top;
+            // if (!dC && Cmode === 1)
+            sx += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
+            // if (!dC && Cmode === 1)
+            sy += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
+            if (dC) CRe += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
+            if (dC) CIm += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
+            k /= new Complex(Lx, Ly).Sub(new Complex(Lx2, Ly2)).Abs() / new Complex(dx, dy).Sub(new Complex(dx2, dy2)).Abs();
+            Lx2 = dx2;
+            Ly2 = dy2;
+        }
+        Lx = dx;
+        Ly = dy;
+        mReset();
+        textBox1.value = 255 / k;
+        textBox2.value = sx; 
+        textBox3.value = -sy;
+    }
+}
+
+function timer1_Tick() {
+    //gr = pictureBox1.getContext('2d');
+    //d++; if (d > 25) d = 0;
+    label1.innerText = "R: " + dist;
+    
+    Draw();
+    if (animation)
+    {
+        t += dt;
+        textBox4.value = t;
+        operations.forEach(function(op) { if(op.variability <= 2) op.relevance = false; });
+    }
+    requestAnimationFrame(this.Draw.bind(this));
+}
+
+function mReset() { 
+    m = pictureBox1.width + pictureBox1.height;
+    x = Math.floor(-pictureBox1.width / 2.0 - m / 2.0);
+    y = Math.floor(-pictureBox1.height / 2.0 - m / 2.0);
+    operations.forEach(function(op) { if(op.variability <= 2) op.relevance = false; });
+}
+
+function Draw() {
+    gr = pictureBox1.getContext('2d');
+    if (!animation) {
+        for (var i = 0; i < 2500; i++) {
+            if (m >= 1) { 
+                if (x <= (pictureBox1.width / 2.0 + m)) { 
+                    if (y <= (pictureBox1.height / 2.0 + m)) { 
+                        operations.forEach(function(op) { if(op.variability <= 0) op.relevance = false; });
+                        c = new Complex((x / k + sx), -(y / k + sy));
+                        gr.fillStyle = Calculation(c); //textBox1.value = gr.fillStyle;
+                        gr.fillRect(Math.floor(x + (pictureBox1.width / 2.0 - m / 2.0)), Math.floor(y + (pictureBox1.height / 2.0 - m / 2.0)), m, m); //gr.fillRect(x, y, width, height);
+                        y += Math.floor(m);
+                    } else {
+                        operations.forEach(function(op) { if(op.variability <= 1) op.relevance = false; });
+                        x += Math.floor(m);
+                        y = Math.floor(-pictureBox1.height / 2.0 - m / 2.0);
+                    }
+                } else {
+                    m /= 2; //m = (m + 1) / 2 - 1;
+                    x = Math.floor(-pictureBox1.width / 2.0 - m / 2.0);
+                    y = Math.floor(-pictureBox1.height / 2.0 - m / 2.0);
+                }
+            }
+        }
+    }
+    else if (m >= 1) {
+        m = (pictureBox1.width + pictureBox1.height) / 175; //300;
+        //const bitmap2 = document.createElement('canvas'); try { bitmap2.width = window.innerWidth / m; bitmap2.height = window.innerHeight / m; } catch { bitmap2.width = 1; bitmap2.height = 1; };
+        for (var x1 = 0; x1 < window.innerWidth / m;  x1++) {
+            operations.forEach(function(op) { if(op.variability <= 1) op.relevance = false; });
+            for (var y1 = 0; y1 < window.innerHeight / m; y1++)  
+            {
+                operations.forEach(function(op) { if(op.variability <= 0) op.relevance = false; });
+                c = new Complex(((x1 - window.innerWidth / m / 2.0) / k * m + sx), -((y1 - window.innerHeight / m / 2.0) / k * m + sy));
+                gr.fillStyle = Calculation(c); //pen.Color = col;
+                try { gr.fillRect(x1 * m, y1 * m, m + 1, m + 1); } catch { } //gr.FillRectangle(pen.Brush, Convert.ToInt32(x1), Convert.ToInt32(y1), (float)m, (float)m);
+            }
+        }
+        //m = 0;
+        //gr.drawImage(bitmap2, 0, 0, pictureBox1.width, pictureBox1.height, 0, 0, bitmap2.width, bitmap2.height);
+        //mReset();
+    }
+}
+
+function Min(a,b) { return Math.abs(b)<Math.abs(a)?b:a; }
+function Max(a,b) { return Math.abs(b)>Math.abs(a)?b:a; }
+function button3_Click() {
+    operations = [];
+    Fvalue = Recognition(String(richTextBox1.value)); //console.log(operations);
+    mReset();
+}
+function Recognition(formula) {
+    formula = String(formula);
+    var multiexpression=false, And=false, Abs=false, equality=false, Sum=false, Sub=false, Mul=false, Div=false, Pow=false, Root=false, Fct=false, Mod=false;
+    {
+        var level = 0, formula1 = "";
+        for (var i = 0; i < formula.length; i++) if (formula[i] != ' ') {
+            if (formula[i] == ',') formula1 += '.';
+            else if (formula[i] == 'π') formula1 += 'p';
+            else if (formula[i] == '−') formula1 += '-';
+            else if (formula[i] == '–') formula1 += '-';
+            else if (formula[i] == '—') formula1 += '-';
+            else if (formula[i] == ':') formula1 += '/';
+            else if (formula[i] == '÷') formula1 += '/';
+            else if (formula[i] == '×') formula1 += '*';
+            else if (formula[i] == '≤') formula1 += '<';
+            else if (formula[i] == '≥') formula1 += '>';
+            else if (formula[i] == '∧') formula1 += '&';
+            else if (formula[i] == '≡') formula1 += '=';
+            else if (formula[i] == '↔') formula1 += '=';
+            else if (formula[i] == '⇔') formula1 += '=';
+            else if (formula[i] == '[') formula1 += "round(";
+            else if (formula[i] == '⌊') formula1 += "Dround(";
+            else if (formula[i] == '⌈') formula1 += "Uround(";
+            else if (formula[i] == ']') formula1 += ')';
+            else if (formula[i] == '⌋') formula1 += ')';
+            else if (formula[i] == '⌉') formula1 += ')';
+            else if (formula[i] == '⋮') formula1 += '%';
+
+            else formula1 += String(formula[i]);
+        }
+        formula = formula1;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if(formula[i] == ')') level--;
+            if(formula[i]=='\n') multiexpression = true;
+            if(level <= 0) {
+                if(['=', '>', '<'].includes(formula[i])) equality = true;
+                if(!Sub && formula[i] == '+') Sum = true;
+                if(!Sum && formula[i] == '-') Sub = true;
+                if(!Div && formula[i] == '*') Mul = true;
+                if(!Mul && formula[i] == '/') Div = true;
+                if(formula[i] == '%') Mod = true;
+                if(formula[i] == '^') Pow = true;
+                if(formula[i] == '√') Root = true;
+                if(formula[i] == '!') Fct = true;
+                if(formula[i] == '|') Abs = true;
+                if(formula[i] == '&') And = true;
+            }
+        }
+    }
+
+    if (multiexpression) {
+        formula1 = "Mex(";
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] != '\n') formula1 += String(formula[i]);
+            else formula1 += ";";
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Abs) {
+        var Open = false, level = 0, formula1 = "(";
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || formula[i] != '|') formula1 += String(formula[i]);
+            else if (formula[i] == '|') {
+                if (!Open) formula1 += "Abs(";
+                else formula1 += ")";
+                Open = !Open;
+            }
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (And) {
+        var level = 0, formula1 = "And(";
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || formula[i] != '&') formula1 += String(formula[i]);
+            else formula1 += ";";
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (equality) {
+        //bool larger = false;
+        //bool less = false;
+        var level = 0, formula1 = "Max(", args = [], types = "", arg = "";
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level >= 0) {
+                if (level > 0 || formula[i] != '=' && formula[i] != '>' && formula[i] != '<') arg += String(formula[i]);
+                else if (formula[i] == '=' || formula[i] == '>' || formula[i] == '<') {
+                    //if (formula[i] == '>') larger = true;
+                    //if (formula[i] == '<') less = true;
+                    //formula1 += ";";
+                    types += String(formula[i]);
+                    args.push(arg);
+                    arg = "";
+                }
+            }
+        }
+        args.push(arg);
+        for (var i = 0; i < types.length; i++) {
+            if (types[i] == '=') formula1 += "Eq(" + args[i] + ";" + args[i + 1] + ")";
+            if (types[i] == '>') formula1 += "Lar(" + args[i] + ";" + args[i + 1] + ")";
+            if (types[i] == '<') formula1 += "Les(" + args[i] + ";" + args[i + 1] + ")";
+            if (i + 1 < types.length) formula1 += ";";
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Sum || Sub) {
+        var formula1 = ""; if (Sum) formula1 = "Sum("; if (Sub) formula1 = "Sub(";
+        var level = 0, one = true;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || formula[i] != '+' && formula[i] != '-') formula1 += String(formula[i]);
+            else if (one) { formula1 += ";"; one = false; }
+            else {
+                if (formula[i] == '+') formula1 = "Sum(" + formula1 + ");";
+                if (formula[i] == '-') formula1 = "Sub(" + formula1 + ");";
+            }
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Mul || Div) {
+        var formula1 = ""; if (Mul) formula1 = "Mul("; if (Div) formula1 = "Div(";
+        var level = 0, one = true;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || formula[i] != '*' && formula[i] != '/') formula1 += formula[i];
+            else if (one) { formula1 += ";"; one = false; }
+            else {
+                if (formula[i] == '*') formula1 = "Mul(" + formula1 + ");";
+                if (formula[i] == '/') formula1 = "Div(" + formula1 + ");";
+            }
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Mod) {
+        var level = 0, formula1 = "", one = true;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || !one || !['%', 'g', 'G'].includes(formula[i])) formula1 += formula[i];
+            else if (i > 0 && formula[i] == '%' && (formula[i-1] == 'g' || formula[i-1] == 'G')) { formula1 = "Gmod(" + formula1 + ";"; one = false; }
+            else if (formula[i] == '%') { formula1 = "Mod(" + formula1 + ";"; one = false; }
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Pow) {
+        var level = 0, formula1 = "", one = true;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || !one || formula[i] != '^') formula1 += formula[i];
+            else if (formula[i] == '^') { formula1 = "Pow(" + formula1 + ";"; one = false; }
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Root) {
+        var level = 0, formula1 = "", one = true;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || !one || formula[i] != '√') formula1 += formula[i];
+            else if (formula[i] == '√') { formula1 += "Sqrt("; one = false; }
+        }
+        formula1 += ")";
+        formula = formula1;
+    } else if (Fct) {
+        var level = 0, formula1 = "", one = true;
+        for (var i = 0; i < formula.length; i++) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0 || !one || formula[i] != '!') formula1 += formula[i];
+            else if (formula[i] == '!') { formula1 = "Mul(Fct(" + formula1 + ");"; one = false; }
+        }
+        formula1 += ")";
+        formula = formula1;
+    }
+
+    while (formula != "") {
+        var i = 0, operation = "";
+        while (i < formula.length && formula[i] != '(') operation += String(formula[i++]);
+        if (i >= formula.length) break;
+        var level = 1, arguments = "";
+        i++;
+        while (i < formula.length && level > 0) {
+            if (formula[i] == '(') level++;
+            else if (formula[i] == ')') level--;
+            if (level > 0) arguments += String(formula[i++]);
+        }
+        if (i >= formula.length || arguments == "") break;
+        args = [];
+        {
+            var arg = "", level = 0;
+            for (var j = 0; j < arguments.length; j++) {
+                if (arguments[j] == '(') level++;
+                else if (arguments[j] == ')') level--;
+                if (level >= 0) {
+                    if (level > 0 || arguments[j] != ';') arg += String(arguments[j]);
+                    else {
+                        args.push(arg);
+                        arg = "";
+                    }
+                }
+            }
+            args.push(arg);
+        }
+        var args1 = [];
+        for (var j = 0; j < args.length; j++) args1.push(String(this.Recognition(args[j]))); //console.log(args1);
+        args = args1;
+        if (operation == "Sum" || operation == "Sub") for (var j = 0; j < args.length; j++) if (args[j] == "") args[j] = "0";
+        {
+            var j = 0
+            for (; j < operations.length; j++) if (operations[j].name == operation && operations[j].args == args) break;
+            if (j >= operations.length) operations.push(new Operation(operation, args, operations));
+            var formula1 = "r" + String(j);
+            i++;
+            while (i < formula.length) formula1 += String(formula[i++]);
+            formula = formula1;
+        }
+    }
+    
+    return String(formula); 
+}
+
+function CalculationValue(value) {
+    value = String(value);
+    if (value == "") return new Complex(1);
+    if (value[0] == 'r' && value.length > 1) {
+        var id = ""; for (var i = 1; i < value.length; i++) id += String(value[i]);
+        const op = operations[Math.floor(id)];
+        if(op.relevance) return op.value;
+        sargs = op.args;
+        var args2 = [];
+        args2.length = 0;
+        sargs.forEach(function(arg) { args2.push(CalculationValue(arg)); });
+        var args = args2; //console.log(args);
+
+        if (op.name == "") op.value = new Complex(args[0]);
+        else if (op.name == "Eq") {
+            op.value = new Complex(args[0].Sub(args[1]).Abs());
+        }
+        else if (op.name == "Lar") { //if (larger) formula1 = "Div(Sub(" + formula1 + ";Abs(" + formula1 + "));2)";
+            var result = args[0].Sub(args[1]).Re;
+            if (result > 0) result = 0;
+            op.value = new Complex(Math.abs(result));
+        }
+        else if (op.name == "Les") { //if (less) formula1 = "Div(Sum(" + formula1 + ";Abs(" + formula1 + "));2)";
+            var result = args[0].Sub(args[1]).Re;
+            if (result < 0) result = 0;
+            op.value = new Complex(Math.abs(result));
+        }
+        else if (op.name == "Mex") {
+            var result = args[0].Abs();
+            for (var i = 1; i < args.length; i++) if ((args[i].Abs() < result || !(args[i].Abs() > result)) && (args[i].Abs() >= 0 || args[i].Abs() <= 0)) result = args[i].Abs();
+            op.value = new Complex(result);
+        }
+        else if (op.name == "And") {
+            var result = args[0].Abs();
+            for (var i = 1; i < args.length; i++) if ((args[i].Abs() > result || !(args[i].Abs() < result)) && (args[i].Abs() >= 0 || args[i].Abs() <= 0)) result = args[i].Abs();
+            op.value = new Complex(result);
+        }
+        else if (op.name == "Complex") op.value = new Complex(args[0].Re, args[1].Re);
+        else if (op.name == "Re") op.value = new Complex(args[0].Re);
+        else if (op.name == "Im") op.value = new Complex(args[0].Im);
+        else if (op.name == "Min" || op.name == "min") { //if (Math.Abs(b) < Math.Abs(a) || !(Math.Abs(b) > Math.Abs(a)) && (b >= 0 || b <= 0)) a = b;
+            var result = args[0].Re;
+            for (var i = 1; i < args.length; i++) if ((args[i].Re < result || !(args[i].Re > result)) && (args[i].Re >= 0 || args[i].Re <= 0)) result = args[i].Re;
+            op.value = new Complex(result);
+        }
+        else if (op.name == "Max" || op.name == "max") {
+            var result = args[0].Re;
+            for (var i = 1; i < args.length; i++) if ((args[i].Re > result || !(args[i].Re < result)) && (args[i].Re >= 0 || args[i].Re <= 0)) result = args[i].Re;
+            op.value = new Complex(result);
+        }
+        else if (op.name == "Round" || op.name == "round") op.value = args[0].Round();
+        else if (op.name == "Uround" || op.name == "uround") op.value = args[0].Uround();
+        else if (op.name == "Dround" || op.name == "dround") op.value = args[0].Dround();
+        else if (op.name == "Abs" || op.name == "abs") op.value = new Complex(args[0].Abs());
+        else if (["Sign", "sign", "Sgn", "sgn"].includes(op.name)) op.value = args[0].Sign();
+        else if (op.name == "Conj" || op.name == "conj") op.value = args[0].Conj();
+        else if (op.name == "Sum" || op.name == "sum") {
+            var result = new Complex(args[0]);
+            for (var i = 1; i < args.length; i++) result = result.Sum(args[i]);
+            op.value = result;
+        }
+        else if (op.name == "Sub" || op.name == "sub") op.value = args[0].Sub(args[1]);
+        else if (op.name == "Mul" || op.name == "mul") {
+            var result = new Complex(args[0]);
+            for (var i = 1; i < args.length; i++) result = result.Mul(args[i]);
+            op.value = result;
+        }
+        else if (op.name == "Div" || op.name == "div") op.value = args[0].Div(args[1]);
+        else if (op.name == "Mod" || op.name == "mod") op.value = args[0].Mod(args[1]);
+        else if (op.name == "Gmod" || op.name == "gmod") op.value = args[0].Gmod(args[1]);
+        else if (["Lcm", "lcm", "НОК", "нок"].includes(op.name)) {
+            var result = new Complex(args[0]);
+            for (var i = 1; i < args.length; i++) result = result.Lcm(args[i]);
+            op.value = result;
+        }
+        else if (["Gcd", "gcd", "НОД", "нод"].includes(op.name)) {
+            var result = new Complex(args[0]);
+            for (var i = 1; i < args.length; i++) result = result.Gcd(args[i]);
+            op.value = result;
+        }
+        else if (["Arg", "arg", "Angle", "angle"].includes(op.name)) op.value = new Complex(args[0].Arg()); 
+        else if (["Drct", "drct", "Expi", "expi"].includes(op.name)) op.value = args[0].Drct();
+        else if (op.name == "Exp" || op.name == "exp") { if(args.length > 1) op.value = args[0].Exp(args[1]); else op.value = Complex.Pow(Math.E, args[0]); }
+        else if (op.name == "Pow" || op.name == "pow") op.value = args[0].Pow(args[1]);
+        else if (op.name == "Sqrt" || op.name == "sqrt") op.value = args[0].Pow(0.5);
+        else if (op.name == "Root" || op.name == "root") { if(args.length > 1) op.value = args[0].Pow(new Complex(1).Div(args[1])); else op.value = args[0].Pow(0.5); }
+        else if (op.name == "Ln" || op.name == "ln") op.value = args[0].Ln();
+        else if (op.name == "Lg" || op.name == "lg") op.value = args[0].Log(10);
+        else if (op.name == "Log" || op.name == "log") { if(args.length > 1) op.value = args[0].Log(args[1]); else op.value = args[0].Log(10);}
+        else if (op.name == "Sin" || op.name == "sin") op.value = args[0].Sin();
+        else if (op.name == "Cos" || op.name == "cos") op.value = args[0].Cos();
+        else if (["Tan", "tan", "Tg", "tg"].includes(op.name)) op.value = args[0].Tan();
+        else if (op.name == "Ctg" || op.name == "ctg") op.value = new Complex(1).Div(args[0].Tan());
+        else if (op.name == "Sec" || op.name == "sec") op.value = new Complex(1).Div(args[0].Cos());
+        else if (["Csc", "csc", "Cosec", "cosec"].includes(op.name)) op.value = new Complex(1).Div(args[0].Sin());
+        else if (["Asin", "asin", "Arcsin", "arcsin"].includes(op.name)) op.value = args[0].Asin();
+        else if (["Acos", "acos", "Arccos", "arccos"].includes(op.name)) op.value = args[0].Acos();
+        else if (["Atan", "atan", "Atg", "atg", "Arctan", "arctan", "Arctg", "arctg"].includes(op.name)) op.value = args[0].Atan();
+        else if (["Actg", "actg", "Arcctg", "arcctg"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Atan();
+        else if (["Asec", "asec", "Arcsec", "arcsec"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Acos();
+        else if (["Acsc", "acsc", "Acosec", "acosec", "Arccsc", "arccsc", "Arccosec", "arccosec"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Asin();
+        else if (["Sinh", "sinh", "Sh", "sh"].includes(op.name)) op.value = args[0].Sh();
+        else if (["Cosh", "cosh", "Ch", "ch"].includes(op.name)) op.value = args[0].Ch();
+        else if (["Tanh", "tanh", "Tgh", "tgh", "Th", "th"].includes(op.name)) op.value = args[0].Th();
+        else if (["Ctgh", "ctgh", "Cth", "cth"].includes(op.name)) op.value = new Complex(1).Div(args[0].Th());
+        else if (op.name == "Sech" || op.name == "sech") op.value = new Complex(1).Div(args[0].Ch());
+        else if (["Csch", "csch", "Cosech", "cosech"].includes(op.name)) op.value = new Complex(1).Div(args[0].Sh());
+        else if (["Asinh", "asinh", "Arcsinh", "arcsinh", "Ash", "ash", "Arcsh", "arcsh", "Arsh", "arsh"].includes(op.name)) op.value = args[0].Ash();
+        else if (["Acosh", "acosh", "Arccosh", "arccosh", "Ach", "ach", "Arcch", "arcch", "Arch", "arch"].includes(op.name)) op.value = args[0].Ach();
+        else if (["Atanh", "atanh", "Atgh", "atgh", "Ath", "ath", "Arctanh", "arctanh", "Arctgh", "arctgh", "Arth", "arth"].includes(op.name)) op.value = args[0].Ath();
+        else if (["Actgh", "actgh", "Arcctgh", "arcctgh", "Arctgh", "arctgh", "Arcth", "arcth", "Acth", "acth"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ath();
+        else if (["Asech", "asech", "Arcsech", "arcsech", "Arsech", "arsech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ach();
+        else if (["Acsch", "acsch", "Acosech", "acosech", "Arccsch", "arccsch", "Arccosech", "arccosech", "Arcsch", "arcsch", "Arcosech", "arcosech"].includes(op.name)) op.value = new Complex(1).Div(args[0]).Ash();
+        else if (op.name == "Fct" || op.name == "fct") op.value = args[0].Fct();
+        else if (op.name == "Tetr" || op.name == "tetr") op.value = args[0].Tetr(args[1]);
+        //Def, Itg
+
+        op.relevance = true;
+        return op.value;
+    }
+    else if (value[0] == 'c') return c;
+    else if (value[0] == 'x') return new Complex(c.Re);
+    else if (value[0] == 'y') return new Complex(c.Im);
+    else if (value[0] == 't') return new Complex(t);
+    else if (value[0] == 'p') return new Complex(Math.PI);
+    else if (value[0] == 'e') return new Complex(Math.E);
+    else if (value[0] == 'i') return new Complex(0, 1);
+    else if (value[0] == 'r') return new Complex(c.Abs());
+    else if (value[0] == 'θ') return new Complex(c.Arg());
+
+    else return new Complex(parseFloat(value));
+}
+
+function Calculation(c) {
+    var i = 1;
+    try {
+        //для написания функции
+        // i = 0 = f(x, y)
+        // c.Re = x
+        // c.Im = y
+        i = CalculationValue(Fvalue).Abs(); //Sub(y; Sin(Mul(t; x)))
+        //i = new Complex(c.Re).Pow(c.Im).Sub(new Complex(c.Im).Pow(c.Re)).Abs();
+
+        //double i4 = Complex.Pow(Math.E, Complex.Sub(c.Im, new Complex(0, t))).Sub(c.Re).Abs(); i = Min(i, i4);
+				//double i2 = Complex.Ln(new Complex(c.Re)).Sub(c.Im).Sub(new Complex(0, t % (2 * Math.PI))).Abs(); i = Min(i, i2);
+        //double i3 = Complex.Ln(new Complex(c.Re)).Sub(c.Im).Sub(new Complex(0, (t + Math.PI) % (2 * Math.PI) - Math.PI)).Abs(); i = Min(i, i3);
+
+
+        //i = c.Sin().Pow(2).Sum(c.Cos()).Sub(Math.Tan(t)).Abs();
+        //i = c.Abs() - m / k;
+
+        //i = Complex.Drct(t).Mul(c.Re).Cos().Abs() - c.Im;
+
+        //i = Complex.Sub(Complex.Mul(c.Im, Complex.Drct(0 * Math.PI / 2)), Complex.Mul(c.Re, Complex.Drct(Math.PI / 2)).Cos()).Abs();
+        //double i2 = c.Im - Math.Cos(c.Re); i = Min(i, i2);
+
+
+        //i = c.Sin().Sub(Complex.Drct(t).Mul(2)).Abs();
+
+        dt = 0.025; //скорость анимации
+
+        //дополнительные приёмы:
+        // if (i < 0) i = 0;  <=>  '=' -> '<' //замена равенства на сравнение
+        // double iN = f(x, y); i = Min(i, iN); //для одновременной отрисовки нескольких функций
+
+        //Библиотека готовых функций
+        //i = c.Im - c.Re;								//прямая
+        //i = 1 - c.Abs();								//окружность
+        //i = c.Im - Math.Pow(c.Re, 2);					//парабола
+        //i = c.Im - 1 / c.Re;							//гипербола
+        //i = c.Im - Math.Sin(c.Re);					//синус
+        //i = c.Im - Math.Abs(c.Re);					//модуль
+        //i = c.Im - Math.Sign(c.Re);					//знак
+        //i = c.Im % c.Re;								//остаток от деления;
+        //i = 1 - c.Im * c.Re;							//гипербола без асимтоты;
+        //i = c.Pow(3).Sub(2).Abs();					//кубический корень из 2
+        //i = c.Im - Math.Pow(Math.Abs(c.Re), c.Re);	//тетрация
+        //i = 1 - (c.Re * c.Re - c.Im * c.Im);			//гипербола
+        //i = Math.Tan(Math.PI * c.Re) * Math.Tan(Math.PI * c.Im);						//сетка
+        //i = 2 - (c.Sub(0.75).Abs() + c.Sum(0.75).Abs()); if (i > 0) i = 0;			//овал
+        //i = 1 - c.Pow(2).Sub(1).Abs();												//знак бесконечности
+        //i = 2 - (c.Pow(2).Sub(1).Abs() + c.Pow(2).Sum(1).Abs()); if (i > 0) i = 0;	//+
+        //i = 2 - (c.Pow(2).Sub(0).Abs() + c.Pow(-1).Sum(0).Abs()); if (i > 0) i = 0;
+        //i = 2 - (c.Sub(c.Pow(4)).Mul(1).Abs() + c.Sum(c.Pow(4)).Mul(1.5).Abs());
+        //i = Math.Sin(10 * c.Im) % Math.Sin(1 * c.Re) - Math.Sin(10 * c.Re) % Math.Sin(1 * c.Im);
+        //i = (Math.Abs(c.Im) - Math.Pow(Math.Abs(c.Re), Math.Tan(t))) * Math.Sign(Math.Cos(t)); if (i < 0) i = 0; //выворачивающаяся парабола
+        //i = Math.Pow(2,c.Re) + 4*c.Re - c.Re - 3;
+        //
+        //
+        //
+        //Сложные функции
+        //
+        //
+        //i = Math.Tan(Math.PI * c.Im);							//сетка
+        //double i2 = Math.Tan(Math.PI * c.Re); i = Min(i, i2);
+        //
+        //
+        //Complex z = c;							//множество Мандельброта
+        //int j = 0;
+        //for (; j < 100; j++)
+        //{
+        //    z = z.Pow(new Complex(2.01, 0)).Sum(c);
+        //    if (z.Abs() > 10) break;
+        //    //if (z.Abs() < 1/t) j = 100 - 1;
+        //}
+        //i = Math.Pow(2, 100 - j) - 1;
+        //
+        //
+        //double an = c.Angle();									//спираль архимеда 
+        //if (an < 0) an += 2 * Math.PI;
+        //double an1 = an - 2 * Math.PI;
+        //double an2 = an + 2 * Math.PI;
+        //i = c.Abs() % (2 * Math.PI) - an;
+        //double i1 = c.Abs() % (2 * Math.PI) - an1; i = Min(i, i1);
+        //double i2 = c.Abs() % (2 * Math.PI) - an2; i = Min(i, i2);
+        //
+        //
+        //Complex z = c.Mul(c.Sign());
+        //i = z.Sum(new Complex(Math.Tan(t), Math.Pow(Math.Tan(t), -1))).Abs() - 1; if (i < 0) i = 0;
+        //double i2 = z.Im + Math.Pow(-z.Re, -1); i = Min(i, i2);
+        //
+        //
+        //
+        //Amazing Math Graphs
+        //
+        //Level 1? :)
+        //i = Math.Pow(c.Re, c.Im) - Math.Pow(c.Im, c.Re);				//x^y = y^x;
+        //i = Math.Pow(c.Im, c.Re) * Math.Pow(c.Re, c.Im) - 0.1;		//y^x * x^y = 0.1
+        //i = Math.Pow(c.Im, c.Re) - c.Re * c.Im;						//y^x = xy
+        //i = Math.Pow(Math.Abs(c.Im), c.Re) - (Math.Abs(c.Re) + 2);	//|y|^x = |x| + 2
+        //i = c.Re / c.Im - Math.Pow(c.Re, 3);							//x/y = x^3
+        //i = c.Im - (Math.Pow(Math.E, Math.Sin(c.Re)) + c.Re);			//y = e^sin(x) + x
+        //
+        //Level 2
+        //i = Math.Pow(c.Re, 3) + Math.Pow(c.Im, 3) - (c.Re * c.Re + c.Im);													//x^3 + y^3 = x^2 + y
+        //i = Math.Pow(c.Re, 7) + Math.Pow(c.Im, 9) - (Math.Pow(c.Re, 5) + Math.Pow(c.Im, 3));								//x^7 + y^9 = X^5 + y^3
+        //i = c.Im - Math.Cos(Math.Pow(c.Re, c.Re));																		//y = cos(x^x)
+        //i = c.Im - Math.Sin(Math.Pow(c.Re, Math.Cos(c.Im)));																//y = sin(x^cos(y))
+        //i = Math.Pow(4, Math.Log(Math.Sin(c.Im))) - Math.Tan(Math.Abs(c.Re));												//4^ln(sin(y)) = tan(|x|)
+        //i = c.Im - Math.Log(Math.Sin(c.Re)); if (i < 0) i = 0;															//y < ln(sin(x))
+        //i = Math.Sin(Math.Log(Math.Pow(c.Re, c.Im))); if (i > 0) i = 0;													//sin(ln(x^y)) > 0
+        //i = Math.Log(Math.Pow(c.Re, c.Im)) + Math.Cos(Math.Pow(c.Im, c.Re)) - 1;											//ln(x^y) + cos(y^x) = 1
+        //i = Math.Pow(c.Im, 16) - Math.Pow(c.Im, c.Re*c.Re + c.Im*c.Im) / Math.Log(Math.Pow(2, c.Re*c.Re - c.Im*c.Im));	//y^16 = y^(x^2 + y^2) / ln(2^(x^2 - y^2))
+        //
+        //Lavel 3
+        //i = c.Im - Math.Pow(Math.E, Math.Cos(c.Im * c.Re));																															//y = e^cos(yx)
+        //i = Math.Pow(7, c.Re * Math.Sin(c.Re)) + Math.Pow(c.Re, 7 * Math.Sin(c.Im)) - (c.Im * c.Re*c.Re + Math.Pow(2, c.Re * c.Im*c.Im));												//7^(x*sin(x)) + x^(7*sin(y)) = yx^2 + 2^(xy^2)
+        //i = c.Re*c.Re + c.Im*c.Im - (Math.Tan(Math.Pow(Math.E, c.Re)) + Math.Abs(Math.Pow(4, c.Re) / Math.Sin(c.Im)));																//x^2 + y^2 = tan(e^x) + |4^x / sin(y)|
+        //i = Math.Abs(Math.Sin(c.Re * Math.Cos(c.Re))) - 0.1;																															//|sin(x*cos(x))| = 0.1
+        //i = c.Im - (Math.Pow(Math.Sin(c.Re), c.Re) + Math.Pow(Math.Cos(c.Im), c.Im));																									//y = sin(x)^x + cos(y)^y
+        //i = c.Im - Math.Pow(Math.Cos(c.Re*c.Re), Math.Cos(Math.Pow(c.Re, c.Re)));																										//y = cos(x^2)^cos(x^x)
+        //i = c.Im - (1 / Math.Cos(c.Re*c.Re) + 1 / Math.Sin(c.Re));																													//y = sec(x^2) + csc(x)
+        //i = c.Re - Math.Sqrt(Math.Tan(c.Re * c.Im) / (Math.Pow(4, c.Im) + Math.Pow(c.Re, 4))); double i2 = c.Im - Math.Cos(Math.Pow(4, c.Re) + Math.Pow(c.Im, 4)); i = Min(i, i2);	//x = (tan(xy)/(4^y + x^4))^0.5; y = cos(4^x + y^4)
+        //i = Math.Tan(Math.Pow(c.Re, c.Im)) - Math.Sin(Math.Pow(c.Re, Math.Cos(c.Im)));																								//tan(x^y) = sin(x^cos(y))
+        //i = Math.Sin(Math.Pow(c.Re, Math.E)) + Math.Cos(Math.Pow(c.Im, Math.E)) - 1;																									//sin(x^e) + cos(y^e) = 1
+        //i = Math.Tan(c.Re*c.Re + c.Im*c.Im) - 1;																																		//tan(x^2 + y^2) = 1
+        //i = c.Re - Math.Tan(c.Im*c.Im);																																				//x = tan(y^2)
+        //i = c.Re*c.Re - ((256 * Math.Pow(Math.Cos(Math.Pow(c.Im, 3)), 4) * Math.E * c.Re) % 2); if (i <= 0) i = 0;																	//x^2 <= (256 * cos(y^3)^4 * ex) mod 2
+
+        if (c.Re > sx - m / k && c.Re < sx + m / k && c.Im < -sy + m / k && c.Im > -sy - m / k) dist = i; //вывод расстояния до функции
+    } catch { }
+    if (i == 0) return 'rgb(0, 0, 0)';
+    else if (i == Infinity) return 'rgb(255, 255, 255)';
+    else {
+        i = Math.abs(i);
+        i = Math.log(i,2);
+        
+        if (i >= 0 || i <= 0) try {
+            var r = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 3.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (r > 255) r = 255; if (r < 0) r = 0;
+            var g = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 5.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (g > 255) g = 255; if (g < 0) g = 0;
+            var b = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 1.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (b > 255) b = 255; if (b < 0) b = 0;
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        catch { return 'rgb(255, 255, 255)'; }
+        else { return 'rgb(255, 255, 255)'; }
+    }
+}
+
+function button1_Click() {
+    mReset();
+    animation = !animation;
+    if(animation) timer1Interval = 70;
+    else timer1Interval = 1;
+}
+
+function button4_Click() {
+    pictureBox1.style.zIndex = 1 - pictureBox1.style.zIndex;
+}
