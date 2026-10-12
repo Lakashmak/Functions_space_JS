@@ -23,6 +23,17 @@ class Operation {
     }
 }
 
+const pictureBox1 = document.getElementById('pictureBox1');
+const info = document.getElementById('info');
+const controls = document.getElementById('controls');
+const menu = document.getElementById('menu');
+const menuToolbar = document.getElementById('menuToolbar');
+const groupBox1 = document.getElementById('groupBox1');
+const groupBox2 = document.getElementById('groupBox2');
+const groupBox3 = document.getElementById('groupBox3');
+const label1 = document.getElementById('label1');
+const label2 = document.getElementById('label2');
+const richTextBox1 = document.getElementById('richTextBox1');
 const textBox1 = document.getElementById('textBox1');
 const textBox2 = document.getElementById('textBox2');
 const textBox3 = document.getElementById('textBox3');
@@ -31,8 +42,15 @@ const button1 = document.getElementById('button1');
 const button2 = document.getElementById('button2');
 const button3 = document.getElementById('button3');
 const button4 = document.getElementById('button4');
-const pictureBox1 = document.getElementById('pictureBox1');
-const richTextBox1 = document.getElementById('richTextBox1');
+const button5 = document.getElementById('button5');
+const button6 = document.getElementById('button6');
+const button7 = document.getElementById('button7');
+const button8 = document.getElementById('button8');
+const button9 = document.getElementById('button9');
+const button10 = document.getElementById('button10');
+const button11 = document.getElementById('button11');
+const checkBox1 = document.getElementById('checkBox1');
+const checkBox2 = document.getElementById('checkBox2');
 
 window.addEventListener('resize', resizeCanvas);
 pictureBox1.addEventListener('wheel', (e) => {MouseWheel(e);});
@@ -40,15 +58,34 @@ button2.addEventListener('click', () => {button2_Click();});
 pictureBox1.addEventListener('mousedown', (e) => {pictureBox1_MouseDown(e);});
 pictureBox1.addEventListener('mousemove', (e) => {pictureBox1_MouseMove(e);});
 pictureBox1.addEventListener('mouseup', (e) => {pictureBox1_MouseUp(e);});
+pictureBox1.addEventListener('mouseleave', (e) => {pictureBox1_MouseUp(e);});
 button3.addEventListener('click', () => {button3_Click();});
 button1.addEventListener('click', () => {button1_Click();});
 pictureBox1.addEventListener('touchstart', (e) => {pictureBox1_TouchDown(e);});
 pictureBox1.addEventListener('touchmove', (e) => {pictureBox1_TouchMove(e);});
 pictureBox1.addEventListener('touchend', (e) => {pictureBox1_MouseUp(e);});
 pictureBox1.addEventListener('touchcancel', (e) => {pictureBox1_MouseUp(e);});
-pictureBox1.addEventListener('mouseup', (e) => {pictureBox1_MouseUp(e);});
-pictureBox1.addEventListener('mouseleave', (e) => {pictureBox1_MouseUp(e);});
 button4.addEventListener('click', () => {button4_Click();});
+button5.addEventListener('click', () => {button5_Click();});
+button6.addEventListener('click', () => {button1_Click();});
+button7.addEventListener('click', () => {button7_Click();});
+button8.addEventListener('click', () => {button8_Click();});
+button9.addEventListener('click', () => {button9_Click();});
+menuToolbar.addEventListener('mousedown', (e) => {menu_MouseDown(e);});
+menuToolbar.addEventListener('mousemove', (e) => {menu_MouseMove(e);});
+menuToolbar.addEventListener('mouseup', (e) => {menu_MouseUp(e);});
+menuToolbar.addEventListener('mouseleave', (e) => {menu_MouseUp(e);});
+menuToolbar.addEventListener('touchstart', (e) => {menu_TouchDown(e);});
+menuToolbar.addEventListener('touchmove', (e) => {menu_TouchMove(e);});
+menuToolbar.addEventListener('touchend', (e) => {menu_MouseUp(e);});
+menuToolbar.addEventListener('touchcancel', (e) => {menu_MouseUp(e);});
+button10.addEventListener('click', () => {button10_Click();});
+button11.addEventListener('click', () => {button11_Click();});
+checkBox1.addEventListener('change', () => {checkBox1_Click();});
+checkBox2.addEventListener('change', () => {checkBox2_Click();});
+checkBox3.addEventListener('change', () => {checkBox3_Click();});
+
+//checkBox.addEventListener('change', () => { console.log('changed', checkBox.id, checkBox.checked); this.checkBox_Click(checkBox, "lang", l.id); });
 
 var gr;
 
@@ -73,6 +110,7 @@ var fValue = "";
 var timer1Interval = 1;
 var touchWheel = false;
 var c;
+var Lm = 0;
 
 resizeCanvas();
 fValue = Recognition(String(richTextBox1.value)); //console.log(operations);
@@ -85,6 +123,7 @@ setInterval(timer1_Tick, timer1Interval);
 function resizeCanvas() {
     pictureBox1.width = window.innerWidth;
     pictureBox1.height = window.innerHeight;
+    if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
     gr = pictureBox1.getContext('2d');
     mReset();
 }
@@ -93,7 +132,22 @@ function MouseWheel(e) {
     if (e.deltaY < 0) k *= 1.35;
     else k /= 1.35;
     textBox1.value = 255 / k;
+    infoUpdate();
     mReset();
+}
+
+function button10_Click() {
+	k *= 1.35;
+	textBox1.value = 255 / k;
+	infoUpdate();
+	mReset();
+}
+
+function button11_Click() {
+	k /= 1.35;
+	textBox1.value = 255 / k;
+	infoUpdate();
+	mReset();
 }
 
 function button2_Click() {
@@ -102,6 +156,7 @@ function button2_Click() {
     sy = -parseFloat(textBox3.value);
     t = parseFloat(textBox4.value);
     mReset();
+    infoUpdate();
 }
 
 function pictureBox1_MouseDown(e) {
@@ -168,6 +223,7 @@ function pictureBox1_MouseMove(e) {
         mReset();
         textBox2.value = sx; 
         textBox3.value = -sy;
+        infoUpdate();
     }
 }
 
@@ -204,7 +260,15 @@ function pictureBox1_TouchMove(e) {
         textBox1.value = 255 / k;
         textBox2.value = sx; 
         textBox3.value = -sy;
+        infoUpdate();
     }
+}
+
+function infoUpdate() {
+	label2.innerText = `Масштаб: ${255 / k}
+        X: ${sx}
+        Y: ${-sy}
+        T: ${t}`;
 }
 
 function timer1_Tick() {
@@ -217,6 +281,7 @@ function timer1_Tick() {
     {
         t += dt;
         textBox4.value = t;
+        infoUpdate();
         operations.forEach(function(op) { if(op.variability <= 2) op.relevance = false; });
     }
     //requestAnimationFrame(this.Draw.bind(this));
@@ -512,7 +577,7 @@ function Recognition(formula) {
 
 function CalculationValue(value) {
     value = String(value);
-    if (value == "") return new Complex(1);
+    if (value == "") return new Complex(Infinity);
     if (value[0] == 'r' && value.length > 1) {
         var id = ""; for (var i = 1; i < value.length; i++) id += String(value[i]);
         const op = operations[Math.floor(id)];
@@ -796,5 +861,92 @@ function button1_Click() {
 }
 
 function button4_Click() {
-    pictureBox1.style.zIndex = 1 - pictureBox1.style.zIndex;
+    //pictureBox1.style.zIndex = 1 - pictureBox1.style.zIndex;
+    menu.style.transform = 'translateY(0px)'; 
+}
+
+function button5_Click() {
+	let h = menu.offsetHeight;
+    menu.style.transform = `translateY(${h + 30}px)`; 
+}
+
+function button7_Click() {
+	groupBox1.style.transform = 'translateX(0px)';
+	groupBox2.style.transform = 'translateX(0px)';
+	groupBox3.style.transform = 'translateX(0px)';
+}
+
+function button8_Click() {
+	let w = groupBox1.offsetWidth;
+	groupBox1.style.transform = `translateX(${-w}px)`;
+	groupBox2.style.transform = `translateX(${-w}px)`;
+	groupBox3.style.transform = `translateX(${-w}px)`;
+}
+
+function button9_Click() {
+	let w = groupBox1.offsetWidth;
+	groupBox1.style.transform = `translateX(${-2*w}px)`;
+	groupBox2.style.transform = `translateX(${-2*w}px)`;
+	groupBox3.style.transform = `translateX(${-2*w}px)`;
+}
+
+function checkBox1_Click() {
+	if(checkBox1.checked) {
+		controls.style.display = "none";
+	} else {
+		controls.style.display = "";
+	}
+}
+
+function checkBox2_Click() {
+	if(checkBox2.checked) {
+		info.style.display = "none";
+	} else {
+		info.style.display = "";
+	}
+}
+
+function checkBox3_Click() {
+	if(checkBox3.checked) {
+		button4.style.opacity = 0;
+		button6.style.opacity = 0;
+	} else {
+		button4.style.opacity = 1;
+		button6.style.opacity = 1;
+	}
+}
+
+
+function menu_MouseDown(e) {
+	const rect = e.target.getBoundingClientRect();
+	Lm = e.clientY - rect.top; 
+	menu.style.transitionDuration = "0s";
+}
+
+function menu_TouchDown(e) {
+	const rect = e.target.getBoundingClientRect();
+	Lm = e.touches[0].clientY - rect.top;
+	menu.style.transitionDuration = "0s";
+}
+
+function menu_MouseMove(e) {
+	const rect = e.target.getBoundingClientRect();
+	var dm = e.clientY - rect.top;
+	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
+	if(menu.offsetHeight < 200) menu.style.height = "200px";
+	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
+	Lm = dm;
+}
+
+function menu_TouchMove(e) {
+	const rect = e.target.getBoundingClientRect();
+	var dm = e.touches[0].clientY - rect.top;
+	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
+	if(menu.offsetHeight < 200) menu.style.height = "200px";
+	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
+	Lm = dm;
+}
+
+function menu_MouseUp(e) {
+	menu.style.transitionDuration = "0.3s";
 }

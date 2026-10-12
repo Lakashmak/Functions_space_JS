@@ -4,37 +4,71 @@
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Пространство функций</title>
+    <link rel='icon' type='image/jpeg' href = 'assets/img/Functions_space_logo.ico' id='linkicon'>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body> <!--<body onload="draw();">-->
     <!--<canvas id="drawing" width="930" height="900">Ошибка</canvas>-->
-
-    <div class="container">
-        <button id="button4">Скрыть</button>
-        <div class="controls">
-            <div id="label1">R: 0</div>
-
-            <label>Масштаб:</label>
-            <input type="text" id="textBox1" value="5"><br>
-
-            <label>X:</label>
-            <input type="text" id="textBox2" value="0"><br>
-
-            <label>Y:</label>
-            <input type="text" id="textBox3" value="0"><br>
-
-            <label>T:</label>
-            <input type="text" id="textBox4" value="0"><br>
-
+    
+    <canvas id="pictureBox1" width="800" height="450"></canvas>
+    
+    <div id="info">
+        <div id="label2">Масштаб: 5<br>
+        X: 0<br>
+        Y: 0<br>
+        T: 0</div>
+    </div>
+    
+    <div id="controls">
+        <button id="button10">+</button><br>
+        <button id="button11">–</button>
+    </div>
+    
+    <div class="toolbar">
+        <button id="button4">Меню</button>
+        <button id="button6">Анимация</button>
+    </div>
+    
+    <div id="menu">
+        <div id="menuToolbar">
+            <button id="button5">Скрыть</button>
             <button id="button1">Анимация</button>
-            <button id="button2">Задать положение</button>
-            <button id="button3">Задать выражение</button><br>
-
-            <textarea id="richTextBox1" rows="4" cols="30">y = sin(x^t)</textarea>
+            <br><br>
+            <button id="button7">Выражение</button>
+            <button id="button8">Положение</button>
+            <button id="button9">Настройки</button>
         </div>
+        <div class="menuSlider">
+            <div id="groupBox1" class="slide">
+                <button id="button3">Задать выражение</button><br>
+                <br><textarea id="richTextBox1" rows="4" cols="30">y = sin(x^t)</textarea>
+            </div>
+            <div id="groupBox2" class="slide">
+                <button id="button2">Задать положение</button><br>
+                
+                <label>Масштаб:</label>
+                <input type="text" id="textBox1" value="5"><br>
 
-        <canvas id="pictureBox1" width="800" height="450"></canvas>
-    </div> 
+                <label>X:</label>
+                <input type="text" id="textBox2" value="0"><br>
+
+                <label>Y:</label>
+                <input type="text" id="textBox3" value="0"><br>
+
+                <label>T:</label>
+                <input type="text" id="textBox4" value="0"><br>
+
+                <br><div id="label1">R: 0</div>
+            </div>
+            <div id="groupBox3" class="slide">
+                <input type="checkbox" id="checkBox1"><label for="checkBox1">Скрыть кнопки масштабирования</label><br>
+                <input type="checkbox" id="checkBox2"><label for="checkBox2">Скрыть отображение координат в левом верхнем углу</label><br>
+                <input type="checkbox" id="checkBox3"><label for="checkBox3">Скрыть кнопки в левом нижнем углу</label><br>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="container"></div> -->
 
     <script type="module" src="assets/js/main.js"></script>
 </body>
