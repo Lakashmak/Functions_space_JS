@@ -33,37 +33,55 @@
         <div id="menuToolbar">
             <button id="button5">Скрыть</button>
             <button id="button1">Анимация</button>
-            <br><br>
-            <button id="button7">Выражение</button>
-            <button id="button8">Положение</button>
-            <button id="button9">Настройки</button>
+            <div id="stretchArea"></div>
         </div>
-        <div class="menuSlider">
-            <div id="groupBox1" class="slide">
-                <button id="button3">Задать выражение</button><br>
-                <br><textarea id="richTextBox1" rows="4" cols="30">y = sin(x^t)</textarea>
+        <div class="menuWindow">
+            <div class="tabs">
+                <button id="button7">Выражение</button>
+                <button id="button8">Положение</button>
+                <button id="button9">Настройки</button>
             </div>
-            <div id="groupBox2" class="slide">
-                <button id="button2">Задать положение</button><br>
+            
+            <div class="menuSlider">
+                <div id="groupBox1" class="slide">
+                    <button id="button3">Обновить выражение</button><br>
+                    <textarea id="richTextBox1" rows="4" cols="30">y = sin(x^t)</textarea>
+                </div>
                 
-                <label>Масштаб:</label>
-                <input type="text" id="textBox1" value="5"><br>
+                <div id="groupBox2" class="slide">
+                    <button id="button2">Обновить положение</button><br>
+                
+                    <div class="input-row">
+                        <label>Масштаб:</label>
+                        <input type="text" id="textBox1" value="5">
+                    </div>
+                
+                    <div class="input-row">
+                        <label>X:</label>
+                        <input type="text" id="textBox2" value="0">
+                    </div>
+                
+                   <div class="input-row">
+                        <label>Y:</label>
+                        <input type="text" id="textBox3" value="0">
+                    </div>
+                    
+                    <div class="input-row">
+                        <label>T:</label>
+                        <input type="text" id="textBox4" value="0">
+                    </div>
+                
+                    <button id="button12">Вернуть положение по умолчанию</button><br>
 
-                <label>X:</label>
-                <input type="text" id="textBox2" value="0"><br>
-
-                <label>Y:</label>
-                <input type="text" id="textBox3" value="0"><br>
-
-                <label>T:</label>
-                <input type="text" id="textBox4" value="0"><br>
-
-                <br><div id="label1">R: 0</div>
-            </div>
-            <div id="groupBox3" class="slide">
-                <input type="checkbox" id="checkBox1"><label for="checkBox1">Скрыть кнопки масштабирования</label><br>
-                <input type="checkbox" id="checkBox2"><label for="checkBox2">Скрыть отображение координат в левом верхнем углу</label><br>
-                <input type="checkbox" id="checkBox3"><label for="checkBox3">Скрыть кнопки в левом нижнем углу</label><br>
+                    <br><div id="label1">R: 0</div>
+                </div>
+                
+                <div id="groupBox3" class="slide">
+                    <input type="checkbox" id="checkBox1"><label for="checkBox1">Скрыть кнопки масштабирования</label><br>
+                    <input type="checkbox" id="checkBox2"><label for="checkBox2">Скрыть отображение координат в левом верхнем углу</label><br>
+                    <input type="checkbox" id="checkBox3"><label for="checkBox3">Скрыть кнопки в левом нижнем углу</label><br>
+                    <input type="checkbox" id="checkBox4"><label for="checkBox4">Скрыть координатную сетку</label><br>
+                </div>
             </div>
         </div>
     </div>

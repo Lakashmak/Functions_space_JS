@@ -28,6 +28,7 @@ const info = document.getElementById('info');
 const controls = document.getElementById('controls');
 const menu = document.getElementById('menu');
 const menuToolbar = document.getElementById('menuToolbar');
+const stretchArea = document.getElementById('stretchArea');
 const groupBox1 = document.getElementById('groupBox1');
 const groupBox2 = document.getElementById('groupBox2');
 const groupBox3 = document.getElementById('groupBox3');
@@ -49,8 +50,11 @@ const button8 = document.getElementById('button8');
 const button9 = document.getElementById('button9');
 const button10 = document.getElementById('button10');
 const button11 = document.getElementById('button11');
+const button12 = document.getElementById('button12');
 const checkBox1 = document.getElementById('checkBox1');
 const checkBox2 = document.getElementById('checkBox2');
+const checkBox3 = document.getElementById('checkBox3');
+const checkBox4 = document.getElementById('checkBox4');
 
 window.addEventListener('resize', resizeCanvas);
 pictureBox1.addEventListener('wheel', (e) => {MouseWheel(e);});
@@ -71,19 +75,21 @@ button6.addEventListener('click', () => {button1_Click();});
 button7.addEventListener('click', () => {button7_Click();});
 button8.addEventListener('click', () => {button8_Click();});
 button9.addEventListener('click', () => {button9_Click();});
-menuToolbar.addEventListener('mousedown', (e) => {menu_MouseDown(e);});
-menuToolbar.addEventListener('mousemove', (e) => {menu_MouseMove(e);});
-menuToolbar.addEventListener('mouseup', (e) => {menu_MouseUp(e);});
-menuToolbar.addEventListener('mouseleave', (e) => {menu_MouseUp(e);});
-menuToolbar.addEventListener('touchstart', (e) => {menu_TouchDown(e);});
-menuToolbar.addEventListener('touchmove', (e) => {menu_TouchMove(e);});
-menuToolbar.addEventListener('touchend', (e) => {menu_MouseUp(e);});
-menuToolbar.addEventListener('touchcancel', (e) => {menu_MouseUp(e);});
+stretchArea.addEventListener('mousedown', (e) => {menu_MouseDown(e);});
+stretchArea.addEventListener('mousemove', (e) => {menu_MouseMove(e);});
+stretchArea.addEventListener('mouseup', (e) => {menu_MouseUp(e);});
+stretchArea.addEventListener('mouseleave', (e) => {menu_MouseUp(e);});
+stretchArea.addEventListener('touchstart', (e) => {menu_TouchDown(e);});
+stretchArea.addEventListener('touchmove', (e) => {menu_TouchMove(e);});
+stretchArea.addEventListener('touchend', (e) => {menu_MouseUp(e);});
+stretchArea.addEventListener('touchcancel', (e) => {menu_MouseUp(e);});
 button10.addEventListener('click', () => {button10_Click();});
 button11.addEventListener('click', () => {button11_Click();});
 checkBox1.addEventListener('change', () => {checkBox1_Click();});
 checkBox2.addEventListener('change', () => {checkBox2_Click();});
 checkBox3.addEventListener('change', () => {checkBox3_Click();});
+button12.addEventListener('click', () => {button12_Click();});
+checkBox4.addEventListener('change', () => {checkBox4_Click();});
 
 //checkBox.addEventListener('change', () => { console.log('changed', checkBox.id, checkBox.checked); this.checkBox_Click(checkBox, "lang", l.id); });
 
@@ -111,6 +117,7 @@ var timer1Interval = 1;
 var touchWheel = false;
 var c;
 var Lm = 0;
+var displayGrid = true;
 
 resizeCanvas();
 fValue = Recognition(String(richTextBox1.value)); //console.log(operations);
@@ -336,6 +343,90 @@ function Draw() {
         //gr.drawImage(bitmap2, 0, 0, pictureBox1.width, pictureBox1.height, 0, 0, bitmap2.width, bitmap2.height);
         //mReset();
     }
+    if(displayGrid) {
+    	//отрисовка основных линий сетки системы координат:
+        gr.strokeStyle = "#7f7f7f";
+        gr.lineWidth = 1;
+        let locK = Math.pow(10, Complex.Mod(new Complex(Math.log10(k)), new Complex(1)).Re + 1);
+        
+        for (let i = locK + (sx % (locK/k)) * k; i < window.innerWidth / 2; i += locK) //drawLine(window.innerWidth / 2 + i, 0, window.innerWidth / 2 + i, window.innerHeight);
+            drawLine(window.innerWidth / 2 - i, 0, window.innerWidth / 2 - i, window.innerHeight);
+        for (let i = locK + (sy % (locK/k)) * k; i < window.innerHeight / 2; i += locK) //drawLine(0, window.innerHeight / 2 + i, window.innerWidth, window.innerHeight / 2 + i);
+            drawLine(0, window.innerHeight / 2 - i, window.innerWidth, window.innerHeight / 2 - i);
+        
+        for (let i = locK + (sx % (locK/k)) * k; i > -window.innerWidth / 2; i -= locK) 
+            drawLine(window.innerWidth / 2 - i, 0, window.innerWidth / 2 - i, window.innerHeight);
+        for (let i = locK + (sy % (locK/k)) * k; i > -window.innerHeight / 2; i -= locK)
+            drawLine(0, window.innerHeight / 2 - i, window.innerWidth, window.innerHeight / 2 - i);
+        
+        //отрисовка линий сетки кратных 10 от основных:
+        gr.lineWidth = 1;
+        gr.strokeStyle = "#5f5f5f";
+            
+        for (let i = 10*locK + (sx % (10*locK/k)) * k; i < window.innerWidth / 2; i += 10*locK) //drawLine(window.innerWidth / 2 + i, 0, window.innerWidth / 2 + i, window.innerHeight);
+            drawLine(window.innerWidth / 2 - i, 0, window.innerWidth / 2 - i, window.innerHeight);
+        for (let i = 10*locK + (sy % (10*locK/k)) * k; i < window.innerHeight / 2; i += 10*locK) //drawLine(0, window.innerHeight / 2 + i, window.innerWidth, window.innerHeight / 2 + i);
+            drawLine(0, window.innerHeight / 2 - i, window.innerWidth, window.innerHeight / 2 - i);
+        
+        for (let i = 10*locK + (sx % (10*locK/k)) * k; i > -window.innerWidth / 2; i -= 10*locK) 
+            drawLine(window.innerWidth / 2 - i, 0, window.innerWidth / 2 - i, window.innerHeight);
+        for (let i = 10*locK + (sy % (10*locK/k)) * k; i > -window.innerHeight / 2; i -= 10*locK)
+            drawLine(0, window.innerHeight / 2 - i, window.innerWidth, window.innerHeight / 2 - i);
+        
+        //отрисовка осей координатной плоскости:
+        gr.lineWidth = 2.5;
+        gr.strokeStyle = "#5f5f5f";
+        drawLine(window.innerWidth / 2 - (sx * k), 0, window.innerWidth / 2 - (sx * k), window.innerHeight);
+        drawLine(0, window.innerHeight / 2 - (sy * k), window.innerWidth, window.innerHeight / 2 - (sy * k));
+        
+        //отрисовка числовых значений:
+        gr.fillStyle = "#5f5f5f";
+        gr.font = "10pt Roboto";
+        gr.textAlign = "left";
+        gr.textBaseline = "top";
+        locK = Math.pow(10, Complex.Mod(new Complex(Math.log10(k)-0.3), new Complex(1)).Re + 1 + 0.3);
+        
+        let rndK = Math.pow(10, Math.round(Math.log10(k)-1.5-0.3));
+        let adjX = 0; if(sx >= 0) adjX = -1;
+        let adjY = 0; if(-sy >= 0) adjY = -1;
+        let marginX = 3;
+        let marginY = 3;
+        let lineX = window.innerWidth / 2 - (sx * k) + marginX;
+        let lineY = window.innerHeight / 2 - (sy * k) + marginY;
+        if(sx * k > window.innerWidth / 2) {
+        	lineX = marginX;
+        }
+        if(-sy * k > window.innerHeight / 2) {
+            lineY = window.innerHeight - marginY;
+            gr.textBaseline = "bottom";
+        }
+        if(-sy * k < -window.innerHeight / 2) {
+        	lineY = marginY;
+        }
+        
+        for (let i = locK + (sx % (locK/k)) * k, j = 0; i < window.innerWidth / 2; i += locK, j++) //i += locK + 0*j++
+            gr.fillText(`${Math.round(sx*rndK-j-0.5+adjX)/rndK}`, window.innerWidth / 2 - i + marginX, lineY);
+        for (let i = locK + (sx % (locK/k)) * k, j = 0; i > -window.innerWidth / 2; i -= locK, j--)
+            gr.fillText(`${Math.round(sx*rndK-j-0.5+adjX)/rndK}`, window.innerWidth / 2 - i + marginX, lineY);
+            
+        if(sx * k < -window.innerWidth / 2) {
+        	lineX = window.innerWidth - marginX;
+            gr.textAlign = "right";
+        }
+        gr.textBaseline = "top";
+            
+        for (let i = locK + (sy % (locK/k)) * k, j = 0; i < window.innerHeight / 2; i += locK, j++)
+            gr.fillText(`${Math.round(-sy*rndK+j+1.5+adjY)/rndK}`, lineX, window.innerHeight / 2 - i + marginY);
+        for (let i = locK + (sy % (locK/k)) * k, j = 0; i > -window.innerHeight / 2; i -= locK, j--)
+            gr.fillText(`${Math.round(-sy*rndK+j+1.5+adjY)/rndK}`, lineX, window.innerHeight / 2 - i + marginY);
+    }
+}
+
+function drawLine(x1, y1, x2, y2) {
+    gr.beginPath();
+    gr.moveTo(x1, y1);
+    gr.lineTo(x2, y2);
+    gr.stroke();
 }
 
 function Min(a,b) { return Math.abs(b)<Math.abs(a)?b:a; }
@@ -843,9 +934,9 @@ function Calculation() {
         i = Math.log(i,2);
         
         if (i >= 0 || i <= 0) try {
-            var r = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 3.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (r > 255) r = 255; if (r < 0) r = 0;
-            var g = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 5.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (g > 255) g = 255; if (g < 0) g = 0;
-            var b = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 1.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (b > 255) b = 255; if (b < 0) b = 0;
+            var r = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 3.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (r > 255) r = 255; if (r < 0) r = 0; r = (3*r + 191)/4
+            var g = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 5.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (g > 255) g = 255; if (g < 0) g = 0; g = (2*g + 191)/3
+            var b = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 1.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (b > 255) b = 255; if (b < 0) b = 0; b = (4*b + 191)/5
             return `rgb(${r}, ${g}, ${b})`;
         }
         catch { return 'rgb(255, 255, 255)'; }
@@ -874,6 +965,9 @@ function button7_Click() {
 	groupBox1.style.transform = 'translateX(0px)';
 	groupBox2.style.transform = 'translateX(0px)';
 	groupBox3.style.transform = 'translateX(0px)';
+	button7.style.backgroundColor = "#777777";
+	button8.style.backgroundColor = "#555555";
+	button9.style.backgroundColor = "#555555";
 }
 
 function button8_Click() {
@@ -881,6 +975,9 @@ function button8_Click() {
 	groupBox1.style.transform = `translateX(${-w}px)`;
 	groupBox2.style.transform = `translateX(${-w}px)`;
 	groupBox3.style.transform = `translateX(${-w}px)`;
+	button7.style.backgroundColor = "#555555";
+	button8.style.backgroundColor = "#777777";
+	button9.style.backgroundColor = "#555555";
 }
 
 function button9_Click() {
@@ -888,6 +985,9 @@ function button9_Click() {
 	groupBox1.style.transform = `translateX(${-2*w}px)`;
 	groupBox2.style.transform = `translateX(${-2*w}px)`;
 	groupBox3.style.transform = `translateX(${-2*w}px)`;
+	button7.style.backgroundColor = "#555555";
+	button8.style.backgroundColor = "#555555";
+	button9.style.backgroundColor = "#777777";
 }
 
 function checkBox1_Click() {
@@ -949,4 +1049,22 @@ function menu_TouchMove(e) {
 
 function menu_MouseUp(e) {
 	menu.style.transitionDuration = "0.3s";
+}
+
+function button12_Click() {
+	k = 255 / 5;
+    sx = 0;
+    sy = 0;
+    //t = 0;
+    textBox1.value = 255 / k;
+    textBox2.value = sx;
+    textBox3.value = -sy;
+    textBox4.value = t;
+    infoUpdate();
+    mReset();
+}
+
+function checkBox4_Click() {
+	displayGrid = !displayGrid;
+	mReset();
 }

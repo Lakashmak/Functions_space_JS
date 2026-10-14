@@ -83,13 +83,12 @@ canvas {
 	bottom: 0px;
 	left: 0;
 	width: 100%;
-	height: 300px;
+	height: 276px;
 	background-color: #333333;
-	border: 5px solid #777777;
+	border: 5px solid #555555;
 	z-index: 2;
-	padding: 10px;
 	float: bottom;
-	transform: translateY(330px);
+	/*transform: translateY(330px);*/
 	transition-property: all;
 	transition-duration: 0.3s;
 	display: flex;
@@ -99,6 +98,39 @@ canvas {
 #menuToolbar {
 	flex-shrink: 0;
 	width: 100%;
+	display: flex;
+	gap: 5px;
+	padding-bottom: 5px;
+	background-color: #555555;
+}
+
+#stretchArea {
+	flex-grow: 1; 
+}
+
+.menuWindow {
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	/*height: 100%;*/
+	flex-grow: 1; 
+	min-height: 0;
+	border: 1px solid #444444;
+}
+
+.tabs {
+	display: flex;
+}
+
+.tabs > button {
+	border: 1px solid #444444;
+	border-radius: 0;
+	background-color: #555555;
+	color: white;
+}
+
+#button7 {
+	background-color: #777777;
 }
 
 #button1 {
@@ -108,7 +140,7 @@ canvas {
 .menuSlider {
 	/*display: inline-block;
 	float: top;*/
-	margin-top: 10px;
+	/*margin-top: 10px;*/
 	overflow: hidden;
 	flex-grow: 1;
 	width: 100%;
@@ -142,23 +174,67 @@ canvas {
 	padding: 5px;
 }
 
-#groupBox2 > label {
-    display: block; /* Отображаем метки как блочные элементы */
-    margin-top: 10px;
+#richTextBox1 {
+	margin-top: 10px;
+	width: 100%;
+	height: 152px;
+}
+
+.input-row {
+    margin-top: 7px;
+    margin-bottom: 7px;
+    width: 100%; /* Ширина элементов управления на всю ширину панели */
 }
 
 #groupBox1 > button,
-#groupBox2 > input,
-#groupBox2 > textarea,
 #groupBox2 > button {
-    width: 100%; /* Ширина элементов управления на всю ширину панели */
-    margin-top: 5px;
+	width: 100%;
+}
+
+/*#groupBox1 > button,
+#groupBox2 > button {
+	width: 100%; /* Ширина элементов управления на всю ширину панели *
+}*/
+
+/*#groupBox2 > label {
+    display: block; /* Отображаем метки как блочные элементы *
+    margin-top: 10px;
+}*/
+
+#button2 {
+	margin-bottom: 10px;
+}
+
+.input-row {
+	display: flex;
+}
+
+.input-row > label {
+	margin-top: 3px;
+	width: 60px;
+	text-align: right;
+}
+
+.input-row > input {
+	margin-left: 3px;
+	flex-grow: 1;
+}
+
+#button12 {
+	margin-top: 10px;
 }
 
 label {
     /*background-color: white;*/
     font-size: 10pt;
     width: fit-content;
+}
+
+button {
+	/*border: 1px solid #444444;*/
+	border-radius: 0;
+	background-color: #cccccc;
+	color: black;
 }
 
 
