@@ -41,11 +41,12 @@ export default class Complex {
         }
     }
 
-    Abs() { return Math.sqrt(this.Re * this.Re + this.Im * this.Im); }
+    Abs() { return Complex.Abs(this); /*Math.sqrt(this.Re * this.Re + this.Im * this.Im);*/ }
     static Abs(a) { // |z| модуль (абсолютное значение)
         if (typeof a === 'number') {
             return Math.abs(a);
         } else if (a instanceof Complex) {
+        	if(a.Re == Infinity || a.Re == -Infinity || a.Im == Infinity || a.Im == -Infinity) return Infinity;
             return Math.sqrt(a.Re * a.Re + a.Im * a.Im);
         }
         throw new Error('Invalid argument');
@@ -53,6 +54,14 @@ export default class Complex {
 
     Sign() { // sign(z) направление
         if (this.Re === 0 && this.Im === 0) return new Complex(1);
+        else if(this.Re == Infinity && Complex.Abs(this.Im) != Infinity) return new Complex(1);
+        else if(this.Re == Infinity && this.Im == Infinity) return new Complex(1, 1).Sign();
+        else if(this.Im == Infinity && Complex.Abs(this.Re) != Infinity) return new Complex(0, 1);
+        else if(this.Re == -Infinity && this.Im == Infinity) return new Complex(-1, 1).Sign();
+        else if(this.Re == -Infinity && Complex.Abs(this.Im) != Infinity) return new Complex(-1);
+        else if(this.Re == -Infinity && this.Im == -Infinity) return new Complex(-1, -1).Sign();
+        else if(this.Im == -Infinity && Complex.Abs(this.Re) != Infinity) return new Complex(0, -1);
+        else if(this.Re == Infinity && this.Im == -Infinity) return new Complex(1, -1).Sign();
         else return new Complex(this.Re, this.Im).Div(new Complex(this.Re, this.Im).Abs());
     }
 
@@ -61,6 +70,14 @@ export default class Complex {
             return a === 0 ? 1 : Math.sign(a);
         } else if (a instanceof Complex) {
             if (a.Re === 0 && a.Im === 0) return new Complex(1);
+            else if(a.Re == Infinity && Complex.Abs(a.Im) != Infinity) return new Complex(1);
+            else if(a.Re == Infinity && a.Im == Infinity) return new Complex(1, 1).Sign();
+            else if(a.Im == Infinity && Complex.Abs(a.Re) != Infinity) return new Complex(0, 1);
+            else if(a.Re == -Infinity && a.Im == Infinity) return new Complex(-1, 1).Sign();
+            else if(a.Re == -Infinity && Complex.Abs(a.Im) != Infinity) return new Complex(-1);
+            else if(a.Re == -Infinity && a.Im == -Infinity) return new Complex(-1, -1).Sign();
+            else if(a.Im == -Infinity && Complex.Abs(a.Re) != Infinity) return new Complex(0, -1);
+            else if(a.Re == Infinity && a.Im == -Infinity) return new Complex(1, -1).Sign();
             else return a.Div(a.Abs());
         }
         throw new Error('Invalid argument');
@@ -149,8 +166,12 @@ export default class Complex {
         if (typeof b === 'number') {
             return new Complex((this.Re / b), (this.Im / b));
         } else if (b instanceof Complex) {
-            const c = this.Mul(b.Conj());
-            const denominator = (b.Re * b.Re + b.Im * b.Im);
+            let c = this.Mul(b.Conj()); if(b.Re == 0 && b.Im == 0) c = new Complex(this);
+            let denominator = (b.Re * b.Re + b.Im * b.Im);
+            if(b.Re == Infinity || b.Re == -Infinity || b.Im == Infinity || b.Im == -Infinity) {
+            	if(this.Re == Infinity || this.Re == -Infinity || this.Im == Infinity || this.Im == -Infinity) return new Complex(NaN); //denominator = Infinity; //!
+                else return new Complex(0);
+            }
             return new Complex((c.Re / denominator), (c.Im / denominator));
         }
         throw new Error('Invalid argument');
@@ -162,34 +183,50 @@ export default class Complex {
         } else if (a instanceof Complex && typeof b === 'number') {
             return new Complex((a.Re / b), (a.Im / b));
         } else if (typeof a === 'number' && b instanceof Complex) {
-            const c = a * b.Conj();
-            const denominator = (b.Re * b.Re + b.Im * b.Im);
-            return new Complex((c / denominator), 0); // Упрощаем для случая с числом
+            let c = b.Conj().Mul(a); if(b.Re == 0 && b.Im == 0) c = a;
+            let denominator = (b.Re * b.Re + b.Im * b.Im);
+            if(b.Re == Infinity || b.Re == -Infinity || b.Im == Infinity || b.Im == -Infinity) {
+            	if(a == Infinity || a == -Infinity) return new Complex(NaN); //denominator = Infinity; //!
+                else return new Complex(0);
+            }
+            return new Complex(c.Re / denominator, c.Im / denominator);
         } else if (a instanceof Complex && b instanceof Complex) {
-            const c = a.Mul(b.Conj());
-            const denominator = (b.Re * b.Re + b.Im * b.Im);
+            let c = a.Mul(b.Conj()); if(b.Re == 0 && b.Im == 0) c = a;
+            let denominator = (b.Re * b.Re + b.Im * b.Im);
+            if(b.Re == Infinity || b.Re == -Infinity || b.Im == Infinity || b.Im == -Infinity) {
+            	if(a.Re == Infinity || a.Re == -Infinity || a.Im == Infinity || a.Im == -Infinity) return new Complex(NaN); //denominator = Infinity; //!
+                else return new Complex(0);
+            }
             return new Complex((c.Re / denominator), (c.Im / denominator));
         }
         throw new Error('Invalid arguments');
     }
 
-    Mod(b) { return this.Sub(Complex.Dround(this.Div(b)).Mul(b)); }
+    Mod(b) { return Complex.Mod(this, b);/*this.Sub(Complex.Dround(this.Div(b)).Mul(b));*/ }
     static Mod(a, b) {
         if(typeof a == "number" && typeof b == "number") {
-            return a % b;
+        	if(Complex.Abs(a) == Infinity) return 0;
+            b = Math.abs(b);
+            if(a >= 0) return a % b;
+            let c = b - ((-a) % b); if(c == b) c = 0;
+            else return c;
         } else if (a instanceof Complex || b instanceof Complex ) {
+        	if(Complex.Abs(a) == Infinity) return new Complex(0);
             return a.Sub(Complex.Dround(a.Div(b)).Mul(b));
         }
     }
 
-    Gmod(b) { return this.Sub(Complex.Round(this.Div(b)).Mul(b)); }
-    static Gmod(a, b) { return Complex.Sub(a, Complex.Round(Complex.Div(a, b)).Mul(b)); }
+    Gmod(b) { if(Complex.Abs(this) == Infinity) return new Complex(0); return this.Sub(Complex.Round(this.Div(b)).Mul(b)); }
+    static Gmod(a, b) { if(Complex.Abs(a) == Infinity) return new Complex(0); return Complex.Sub(a, Complex.Round(Complex.Div(a, b)).Mul(b)); }
 
     Gcd(b) { var a = new Complex(this.Re, this.Im); return Complex.Gcd(a, b); }
     static Gcd(a, b) {
         if(Complex.Abs(a) == 0 && Complex.Abs(b) == 0) return new Complex(0);
         if(Complex.Abs(a) == 0) return b;
         if(Complex.Abs(b) == 0) return a;
+        if(Complex.Abs(a) == Infinity && Complex.Abs(b) == Infinity) return new Complex(Infinity);
+        if(Complex.Abs(a) == Infinity) return b;
+        if(Complex.Abs(b) == Infinity) return a;
         var c1, c2;
         if(a.Abs() >= b.Abs()) { c1 = a; c2 = b; }
         else { c1 = b; c2 = a; }
@@ -203,7 +240,12 @@ export default class Complex {
     }
 
     Lcm(b) { var a = new Complex(this.Re, this.Im); return Complex.Lcm(a, b); }
-    static Lcm(a, b) { return a.Mul(b).Div(a.Gcd(b)); }
+    static Lcm(a, b) {
+    	if(Complex.Abs(a) == Infinity && Complex.Abs(b) == Infinity) return new Complex(1);
+        if(Complex.Abs(a) == Infinity) return b;
+        if(Complex.Abs(b) == Infinity) return a;
+    	return a.Mul(b).Div(a.Gcd(b)); 
+    }
 
     Arg() { // угол направления числа
         return Math.acos(this.Sign().Re) * Complex.Sign(Math.asin(this.Sign().Im));
@@ -281,43 +323,129 @@ export default class Complex {
     }
 
     Pow(b) { // ^ возведение в степень
+        const absA = Complex.Abs(this);
         if (typeof b == "number") { // ^ возведение в степень
+            if(absA == Infinity && b == Infinity) return new Complex(Infinity);
+            if(absA == Infinity && b == -Infinity) return new Complex(0);
+            if(absA == Infinity && b > 0) return new Complex(this).Mul(Complex.Pow(Complex.Sign(this), b));
+            if(absA == Infinity && b < 0) return new Complex(0);
+            if(absA == Infinity && b == 0) return new Complex(NaN);
+            if(absA == 0 && b > 0) return new Complex(0);
+            if(absA == 0 && b < 0) return new Complex(Infinity);
+            if(absA == 0 && b == 0) return new Complex(NaN);
+            if(absA > 1 && b == Infinity) return new Complex(Infinity);
+            if(absA > 1 && b == -Infinity) return new Complex(0);
+            if(absA < 1 && b == Infinity) return new Complex(0);
+            if(absA < 1 && b == -Infinity) return new Complex(Infinity);
+            if(absA == 1 && Complex.Abs(b) == Infinity) return new Complex(NaN);
+            
             const c1 = Math.pow(this.Abs(), b);
             const c2 = Complex.Drct(this.Arg() * b);
             return Complex.Mul(c1, c2);
         } else if (b instanceof Complex) { // ^ возведение в степень
+            if(absA == Infinity && b.Im == 0 && b.Re == Infinity) return new Complex(Infinity);
+            if(absA == Infinity && b.Im == 0 && b.Re == -Infinity) return new Complex(0);
+            if(absA == Infinity && b.Im == 0 && b.Re > 0) return new Complex(this).Mul(Complex.Pow(Complex.Sign(this), b));
+            if(absA == Infinity && b.Im == 0 && b.Re < 0) return new Complex(0);
+            if(absA == Infinity && b.Im == 0 && b.Re == 0) return new Complex(NaN);
+            if(absA == 0 && b.Im == 0 && b.Re > 0) return new Complex(0);
+            if(absA == 0 && b.Im == 0 && b.Re < 0) return new Complex(Infinity);
+            if(absA == 0 && b.Im == 0 && b.Re == 0) return new Complex(NaN);
+            if(absA > 1 && b.Im == 0 && b.Re == Infinity) return new Complex(Infinity);
+            if(absA > 1 && b.Im == 0 && b.Re == -Infinity) return new Complex(0);
+            if(absA < 1 && b.Im == 0 && b.Re == Infinity) return new Complex(0);
+            if(absA < 1 && b.Im == 0 && b.Re == -Infinity) return new Complex(Infinity);
+            if(absA == 1 && b.Im == 0 && Complex.Abs(b.Re) == Infinity) return new Complex(NaN);
+            
             const c1 = Math.pow(this.Abs(), b.Re);
             const c2 = Complex.Drct(this.Arg() * b.Re);
             const c3 = Complex.Drct(Math.log(this.Abs()) * b.Im);
             const c4 = Math.pow(Math.E, -b.Im * this.Arg());
-            if (this.Re == 0 && this.Im == 0) return new Complex(0);
-            else return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
+            //if (this.Re == 0 && this.Im == 0) return new Complex(0);
+            /*else*/ return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
         }
     }
     
     static Pow(a, b) { // ^ возведение в степень
+        const absA = Complex.Abs(a);
         if (typeof a == "number" && typeof b == "number") { // ^ возведение в степень
-            const c1 = Math.pow(Complex.Abs(a), b);
+            if(absA == Infinity && b == Infinity) return new Complex(Infinity);
+            if(absA == Infinity && b == -Infinity) return new Complex(0);
+            if(absA == Infinity && b > 0) return new Complex(a).Mul(Complex.Pow(Complex.Sign(a), b));
+            if(absA == Infinity && b < 0) return new Complex(0);
+            if(absA == Infinity && b == 0) return new Complex(NaN);
+            if(absA == 0 && b > 0) return new Complex(0);
+            if(absA == 0 && b < 0) return new Complex(Infinity);
+            if(absA == 0 && b == 0) return new Complex(NaN);
+            if(absA > 1 && b == Infinity) return new Complex(Infinity);
+            if(absA > 1 && b == -Infinity) return new Complex(0);
+            if(absA < 1 && b == Infinity) return new Complex(0);
+            if(absA < 1 && b == -Infinity) return new Complex(Infinity);
+            if(absA == 1 && Complex.Abs(b) == Infinity) return new Complex(NaN);
+            
+            const c1 = Math.pow(absA, b);
             const c2 = Complex.Drct(Complex.Arg(a) * b);
             return Complex.Mul(c1, c2);
         } else if (typeof a == "number" && b instanceof Complex) { // ^ возведение в степень
-            const c1 = Math.pow(a, b.Re);
+            if(absA == Infinity && b.Im == 0 && b.Re == Infinity) return new Complex(Infinity);
+            if(absA == Infinity && b.Im == 0 && b.Re == -Infinity) return new Complex(0);
+            if(absA == Infinity && b.Im == 0 && b.Re > 0) return new Complex(a).Mul(Complex.Pow(Complex.Sign(a), b));
+            if(absA == Infinity && b.Im == 0 && b.Re < 0) return new Complex(0);
+            if(absA == Infinity && b.Im == 0 && b.Re == 0) return new Complex(NaN);
+            if(absA == 0 && b.Im == 0 && b.Re > 0) return new Complex(0);
+            if(absA == 0 && b.Im == 0 && b.Re < 0) return new Complex(Infinity);
+            if(absA == 0 && b.Im == 0 && b.Re == 0) return new Complex(NaN);
+            if(absA > 1 && b.Im == 0 && b.Re == Infinity) return new Complex(Infinity);
+            if(absA > 1 && b.Im == 0 && b.Re == -Infinity) return new Complex(0);
+            if(absA < 1 && b.Im == 0 && b.Re == Infinity) return new Complex(0);
+            if(absA < 1 && b.Im == 0 && b.Re == -Infinity) return new Complex(Infinity);
+            if(absA == 1 && b.Im == 0 && Complex.Abs(b.Re) == Infinity) return new Complex(NaN);
+            
+            const c1 = Math.pow(absA, b.Re);
             const c2 = Complex.Drct(Complex.Arg(a) * b.Re);
-            const c3 = Complex.Drct(Math.log(Complex.Abs(a)) * b.Im);
+            const c3 = Complex.Drct(Math.log(absA) * b.Im);
             const c4 = Math.pow(Math.E, -(b.Im) * Complex.Arg(a));
-            if (a == 0) return new Complex(0);
-            else return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
+            //if (a == 0) return new Complex(0);
+            /*else*/ return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
         } else if (a instanceof Complex && typeof b == "number") { // ^ возведение в степень
+            if(absA == Infinity && b == Infinity) return new Complex(Infinity);
+            if(absA == Infinity && b == -Infinity) return new Complex(0);
+            if(absA == Infinity && b > 0) return new Complex(a).Mul(Complex.Pow(Complex.Sign(a), b));
+            if(absA == Infinity && b < 0) return new Complex(0);
+            if(absA == Infinity && b == 0) return new Complex(NaN);
+            if(absA == 0 && b > 0) return new Complex(0);
+            if(absA == 0 && b < 0) return new Complex(Infinity);
+            if(absA == 0 && b == 0) return new Complex(NaN);
+            if(absA > 1 && b == Infinity) return new Complex(Infinity);
+            if(absA > 1 && b == -Infinity) return new Complex(0);
+            if(absA < 1 && b == Infinity) return new Complex(0);
+            if(absA < 1 && b == -Infinity) return new Complex(Infinity);
+            if(absA == 1 && Complex.Abs(b) == Infinity) return new Complex(NaN);
+            
             const c1 = Math.pow(a.Abs(), b);
             const c2 = Complex.Drct(a.Arg() * b);
             return Complex.Mul(c1, c2);
         } else if (a instanceof Complex && b instanceof Complex) { // ^ возведение в степень
+            if(absA == Infinity && b.Im == 0 && b.Re == Infinity) return new Complex(Infinity);
+            if(absA == Infinity && b.Im == 0 && b.Re == -Infinity) return new Complex(0);
+            if(absA == Infinity && b.Im == 0 && b.Re > 0) return new Complex(a).Mul(Complex.Pow(Complex.Sign(a), b));
+            if(absA == Infinity && b.Im == 0 && b.Re < 0) return new Complex(0);
+            if(absA == Infinity && b.Im == 0 && b.Re == 0) return new Complex(NaN);
+            if(absA == 0 && b.Im == 0 && b.Re > 0) return new Complex(0);
+            if(absA == 0 && b.Im == 0 && b.Re < 0) return new Complex(Infinity);
+            if(absA == 0 && b.Im == 0 && b.Re == 0) return new Complex(NaN);
+            if(absA > 1 && b.Im == 0 && b.Re == Infinity) return new Complex(Infinity);
+            if(absA > 1 && b.Im == 0 && b.Re == -Infinity) return new Complex(0);
+            if(absA < 1 && b.Im == 0 && b.Re == Infinity) return new Complex(0);
+            if(absA < 1 && b.Im == 0 && b.Re == -Infinity) return new Complex(Infinity);
+            if(absA == 1 && b.Im == 0 && Complex.Abs(b.Re) == Infinity) return new Complex(NaN);
+            
             const c1 = Math.pow(a.Abs(), b.Re);
             const c2 = Complex.Drct(a.Arg() * b.Re);
             const c3 = Complex.Drct(Math.log(a.Abs()) * b.Im);
             const c4 = Math.pow(Math.E, -b.Im * a.Arg());
-            if (a.Re == 0 && a.Im == 0) return new Complex(0);
-            else return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
+            //if (a.Re == 0 && a.Im == 0) return new Complex(0);
+            /*else*/ return Complex.Mul(Complex.Mul(c1, c2), Complex.Mul(c3, c4));
         }
     }
     
@@ -468,8 +596,8 @@ export default class Complex {
         const c1 = Complex.Div(Complex.Div(Complex.Pow(Math.PI, 0.5), 2).Sub(1), Complex.Mul(2, (a.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(a.Sum(1).Div(Math.E)).Pow(a.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))),a.Sub(1))).Sub(1));
         result = Complex.Mul(2, (z.Sum(1)).Pow(Complex.Div(1, Math.PI))).Div(Math.PI).Sum(z.Sum(1).Div(Math.E)).Pow(z.Sub(1)).Sub(Complex.Mul(Complex.Sub(1, Complex.Div(1, Complex.Sum(Complex.Div(2, Math.PI), Complex.Div(1, Math.E)))), z.Sub(1))).Sub(1).Mul(c1).Sum(1);
         var n = this.Dround().Re;
-        for(let i = 0; i < n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = this.Sub(i).Mul(result);
-        for(let i = 0; i < -n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = result.Div(this.Sum(i+1));
+        for(let i = 0; i < n && i < 1000 && Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs()); i++) result = this.Sub(i).Mul(result);
+        for(let i = 0; i < -n && i < 1000 && Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs()); i++) result = result.Div(this.Sum(i+1));
         return result;
     } 
     // static Fct(a) {
@@ -491,8 +619,8 @@ export default class Complex {
         //result = b.Mod(1).Pow(this.Log(b.Mod(1).Sum(Complex.Pow(z, b.Mod(1).Sum(z)))));
         //result = b.Mod(1).Pow(this.Ln().Pow(Complex.Sub(Math.E * 2, Complex.Pow(z.Re, b.Mod(1).Sum(1)))));
         //result = z.Log(z).Mul(Complex.Sub(1, b.Mod(1))).Sum(z.Mul(b.Mod(1)));
-        for(let i = 0; i < n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = this.Sub(0).Pow(result);
-        for(let i = 0; i < -n && i < 1000 && result.Abs() != Infinity && result.Abs() != NaN; i++) result = result.Log(this.Sum(0));
+        for(let i = 0; i < n && i < 1000 && Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs()); i++) result = this.Sub(0).Pow(result);
+        for(let i = 0; i < -n && i < 1000 && Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs()); i++) result = result.Log(this.Sum(0));
         return result; //y = Re(tetr(t; x+0.001) - tetr(t; x))/0.001
     }
 } //y = (cos(t)*x+sin(t)*2)^(cos(t)*2+sin(t)*x)
