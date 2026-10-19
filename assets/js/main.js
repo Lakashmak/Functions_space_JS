@@ -789,7 +789,7 @@ function CalculationValue(value) {
         else if (op.name.toLowerCase() == "sub") op.value = args[0].Sub(args[1]);
         else if (op.name.toLowerCase() == "mul") {
             var result = new Complex(args[0]);
-            for (let i = 1; i < args.length; i++) result = result.Mul(args[i]);
+            for (let i = 1; i < args.length; i++) if(!Number.isNaN(args[i].Abs())) result = result.Mul(args[i]);
             op.value = result;
         }
         else if (op.name.toLowerCase() == "div") op.value = args[0].Div(args[1]);
