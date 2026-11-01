@@ -83,7 +83,7 @@ canvas {
 	bottom: 0px;
 	left: 0;
 	width: 100%;
-	height: 276px;
+	height: 300px; /*276*/
 	background-color: #333333;
 	border: 5px solid #555555;
 	z-index: 2;
@@ -177,7 +177,129 @@ canvas {
 #richTextBox1 {
 	margin-top: 10px;
 	width: 100%;
-	height: 152px;
+	height: 40px;/*152px;*/
+	margin-bottom: 10px;
+}
+
+.keyboard {
+	display: flex;
+}
+
+#keyTabs {
+	flex-shrink: 0;
+}
+
+.keyTabBtn {
+	height: 23px;
+	width: 55px;
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	white-space: nowrap;
+	border: 1px solid #555555;
+	border-radius: 0;
+	background-color: #666666;
+	color: white;
+}
+
+#keyTabBtn1 {
+	background-color: #444444;
+}
+
+#keyboardSlider {
+	/*margin-left: 5px;*/
+	/*border: 1px solid #555555;*/
+	background-color: #444444;
+	height: 127px;
+	overflow: hidden;
+	/*flex-grow: 1;*/
+	flex-grow: 1;
+}
+
+.keySlide {
+	display: flex;
+    flex-direction: column;
+	float: top;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	-webkit-overflow-scrolling: touch;
+	transform: translateY(0px);
+	transition-property: all;
+	transition-duration: 0.3s;
+	border: 1px solid #555555;
+	padding: 5px;
+	flex-shrink: 0;
+}
+
+#keyGroupBox1 {
+	
+}
+
+.keyRow {
+	display: flex;
+	flex-wrap: nowrap;
+	width: 100%;
+	flex-grow: 1;
+}
+
+.keyButton,
+.keyButtonsSpecial {
+	max-height: 100%; /*23px; */
+	min-height: 100%; /*23px;*/
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	white-space: nowrap;
+	flex-grow: 1;
+}
+
+.keyRow1 {
+	height: 20%;
+}
+
+.keyButton1,
+.keyButtonsSpecial {
+	min-width: 8.333%;/*21px;*/
+	max-width: 8.333%;/*21px;*/
+}
+
+.keyButtonsSpecial {
+	color: #3f8fcf;
+}
+
+#btnSpace {
+	min-width: 66.667%; /*168px;*/
+	max-width: 66.667%; /*168px;*/
+}
+
+.keyRow2 {
+	height: 20%;
+}
+
+.keyButton2 {
+	min-width: 33.333%;
+	max-width: 33.333%;
+}
+
+.keyRow3 {
+	height: 16.667%;
+}
+
+.keyButton3 {
+	min-width: 25%;
+	max-width: 25%;
+}
+
+.keyRow4 {
+	height: 25%;
+}
+
+.keyButton4 {
+	min-width: 20%;
+	max-width: 20%;
 }
 
 .input-row {

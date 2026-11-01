@@ -55,6 +55,23 @@ const checkBox1 = document.getElementById('checkBox1');
 const checkBox2 = document.getElementById('checkBox2');
 const checkBox3 = document.getElementById('checkBox3');
 const checkBox4 = document.getElementById('checkBox4');
+const keyBtnSym = document.querySelectorAll('.keyBtnSym');
+const btnBackSpace = document.getElementById('btnBackSpace');
+const btnDelete = document.getElementById('btnDelete');
+const btnSpace = document.getElementById('btnSpace');
+const btnEnter = document.getElementById('btnEnter'); 
+const btnLeft = document.getElementById('btnLeft');
+const btnRight = document.getElementById('btnRight');
+const btnKeyboard = document.getElementById('btnKeyboard');
+const keyTabBtn1 = document.getElementById('keyTabBtn1');
+const keyTabBtn2 = document.getElementById('keyTabBtn2');
+const keyTabBtn3 = document.getElementById('keyTabBtn3');
+const keyTabBtn4 = document.getElementById('keyTabBtn4');
+//const keyTabBtn5 = document.getElementById('keyTabBtn5');
+const keyGroupBox1 = document.getElementById('keyGroupBox1');
+const keySlide = document.querySelectorAll('.keySlide');
+const keyBtnFuc1 = document.querySelectorAll('.keyBtnFuc1');
+const keyBtnFuc2 = document.querySelectorAll('.keyBtnFuc2');
 
 window.addEventListener('resize', resizeCanvas);
 pictureBox1.addEventListener('wheel', (e) => {MouseWheel(e);});
@@ -90,6 +107,23 @@ checkBox2.addEventListener('change', () => {checkBox2_Click();});
 checkBox3.addEventListener('change', () => {checkBox3_Click();});
 button12.addEventListener('click', () => {button12_Click();});
 checkBox4.addEventListener('change', () => {checkBox4_Click();});
+keyBtnSym.forEach(kBtn => {kBtn.addEventListener('click', (e) => {keyBtnSym_Click(e);});});
+richTextBox1.addEventListener('blur', () => {rtb1Selection = false; lastRTB1SelectionStart = richTextBox1.selectionStart; lastRTB1SelectionEnd = richTextBox1.selectionEnd; richTextBox1.virtualKeyboardPolicy = 'manual';});
+richTextBox1.addEventListener('focus', () => {rtb1Selection = true; richTextBox1.setSelectionRange(lastRTB1SelectionStart, lastRTB1SelectionEnd);});
+btnBackSpace.addEventListener('click', () => {btnBackSpace_Click();});
+btnDelete.addEventListener('click', () => {btnDelete_Click();});
+btnSpace.addEventListener('click', () => {btnSpace_Click();});
+btnEnter.addEventListener('click', () => {btnEnter_Click();});
+btnLeft.addEventListener('click', () => {btnLeft_Click();});
+btnRight.addEventListener('click', () => {btnRight_Click();});
+btnKeyboard.addEventListener('click', () => {btnKeyboard_Click();});
+keyTabBtn1.addEventListener('click', () => {keyTabBtn1_Click();});
+keyTabBtn2.addEventListener('click', () => {keyTabBtn2_Click();});
+keyTabBtn3.addEventListener('click', () => {keyTabBtn3_Click();});
+keyTabBtn4.addEventListener('click', () => {keyTabBtn4_Click();});
+//keyTabBtn5.addEventListener('click', () => {keyTabBtn5_Click();});
+keyBtnFuc1.forEach(kBtn => {kBtn.addEventListener('click', (e) => {keyBtnFuc1_Click(e);});});
+keyBtnFuc2.forEach(kBtn => {kBtn.addEventListener('click', (e) => {keyBtnFuc2_Click(e);});});
 
 //checkBox.addEventListener('change', () => { console.log('changed', checkBox.id, checkBox.checked); this.checkBox_Click(checkBox, "lang", l.id); });
 
@@ -105,19 +139,24 @@ var k = 51;
 var sx = 0, sy = 0;
 //var ssx = 0; //var ssy = 0;
 var x = 0, y = 0;
-var dC = false;
+let dC = false;
 //var sn = 2;
 var t = 0, dt = 0.1;
 var dist = "загрузка...";
-var animation = false;
+let animation = false;
 var buttontype = -1;
 var operations = [];
 var fValue = "";
 var timer1Interval = 1;
-var touchWheel = false;
+let touchWheel = false;
 var c;
 var Lm = 0;
-var displayGrid = true;
+let displayGrid = true;
+let rtb1Selection = false;
+let lastRTB1SelectionStart = richTextBox1.value.length;
+let lastRTB1SelectionEnd = richTextBox1.value.length;
+//let virtualKeyboard = false;
+
 
 resizeCanvas();
 fValue = Recognition(String(richTextBox1.value)); //console.log(operations);
@@ -133,6 +172,7 @@ function resizeCanvas() {
     if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
     gr = pictureBox1.getContext('2d');
     mReset();
+    keyboardSlider.style.height = `${((keyboardSlider.offsetWidth-10)/12*5)+25}px`;`${((keyboardSlider.offsetWidth-10)/12*5)+25}px`;
 }
 
 function MouseWheel(e) {
@@ -1096,7 +1136,7 @@ function menu_MouseMove(e) {
 	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
 	if(menu.offsetHeight < 200) menu.style.height = "200px";
 	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
-	Lm = dm;
+	//Lm = dm;
 }
 
 function menu_TouchMove(e) {
@@ -1105,7 +1145,7 @@ function menu_TouchMove(e) {
 	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
 	if(menu.offsetHeight < 200) menu.style.height = "200px";
 	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
-	Lm = dm;
+	//Lm = dm;
 }
 
 function menu_MouseUp(e) {
@@ -1128,4 +1168,197 @@ function button12_Click() {
 function checkBox4_Click() {
 	displayGrid = !displayGrid;
 	mReset();
+}
+
+function keyBtnSym_Click(e) {
+	/*if(rtb1Selection) {
+		lastRTB1SelectionStart = richTextBox1.selectionStart;
+		lastRTB1SelectionEnd = richTextBox1.selectionEnd;
+	}*/
+	const btn = e.currentTarget;
+	var str = richTextBox1.value;
+	var str1 = "";
+	for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+	str1 += String(btn.textContent);
+	for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+	richTextBox1.value = str1;
+	lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length;
+	richTextBox1.focus();
+}
+
+function btnBackSpace_Click() {
+	var str = richTextBox1.value;
+	var str1 = "";
+	if(lastRTB1SelectionStart == lastRTB1SelectionEnd) {
+		for(let i = 0; i < lastRTB1SelectionStart - 1; i++) str1 += String(str[i]);
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		if(lastRTB1SelectionStart - 1 >= 0) lastRTB1SelectionEnd = --lastRTB1SelectionStart;
+	} else {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart;
+	}
+	richTextBox1.value = str1;
+	richTextBox1.focus();
+}
+
+function btnDelete_Click() {
+	var str = richTextBox1.value;
+	var str1 = "";
+	if(lastRTB1SelectionStart == lastRTB1SelectionEnd) {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		for(let i = lastRTB1SelectionEnd + 1; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart;
+	} else {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart;
+	}
+	richTextBox1.value = str1;
+	richTextBox1.focus();
+}
+
+function btnSpace_Click() {
+	var str = richTextBox1.value;
+	var str1 = "";
+	for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+	str1 += " ";
+	for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+	richTextBox1.value = str1;
+	lastRTB1SelectionEnd = ++lastRTB1SelectionStart;
+	richTextBox1.focus();
+}
+
+function btnEnter_Click() {
+	var str = richTextBox1.value;
+	var str1 = "";
+	for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+	str1 += "\n";
+	for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+	richTextBox1.value = str1;
+	lastRTB1SelectionEnd = ++lastRTB1SelectionStart;
+	richTextBox1.focus();
+}
+
+function btnLeft_Click() {
+	if(lastRTB1SelectionEnd-1 >= 0) lastRTB1SelectionStart = --lastRTB1SelectionEnd;
+	richTextBox1.focus();
+}
+
+function btnRight_Click() {
+	if(lastRTB1SelectionEnd+1 <= richTextBox1.value.length) lastRTB1SelectionStart = ++lastRTB1SelectionEnd;
+	richTextBox1.focus();
+}
+
+function btnKeyboard_Click() {
+	richTextBox1.blur();
+	richTextBox1.virtualKeyboardPolicy = 'auto';
+	requestAnimationFrame(() => {richTextBox1.focus();});
+	navigator.virtualKeyboard?.show();
+	/*if(virtualKeyboard) {
+		navigator.virtualKeyboard?.hide();
+	} else {
+		navigator.virtualKeyboard?.show();
+	}
+	virtualKeyboard = !virtualKeyboard;*/
+}
+
+for (const type of [
+    'beforeinput',
+    'input',
+    'compositionstart',
+    'compositionupdate',
+    'compositionend'
+]) {
+    richTextBox1.addEventListener(type, e => {
+        console.log(type, {
+            data: e.data,
+            value: richTextBox1.value,
+            composing: e.isComposing
+        });
+    });
+}
+
+function keyTabBtn1_Click() {
+	richTextBox1.focus();
+	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
+	keyTabBtn1.style.backgroundColor = "#444444";
+	let h = keyGroupBox1.offsetHeight;
+	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-0*h}px)`;});
+}
+
+function keyTabBtn2_Click() {
+	richTextBox1.focus();
+	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
+	keyTabBtn2.style.backgroundColor = "#444444";
+	let h = keyGroupBox1.offsetHeight;
+	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-1*h}px)`;});
+}
+
+function keyTabBtn3_Click() {
+	richTextBox1.focus();
+	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
+	keyTabBtn3.style.backgroundColor = "#444444";
+	let h = keyGroupBox1.offsetHeight;
+	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-2*h}px)`;});
+}
+
+function keyTabBtn4_Click() {
+	richTextBox1.focus();
+	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
+	keyTabBtn4.style.backgroundColor = "#444444";
+	let h = keyGroupBox1.offsetHeight;
+	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-3*h}px)`;});
+}
+
+/*function keyTabBtn5_Click() {
+	richTextBox1.focus();
+	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
+	keyTabBtn5.style.backgroundColor = "#444444";
+	let h = keyGroupBox1.offsetHeight;
+	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-4*h}px)`;});
+}*/
+
+function keyBtnFuc1_Click(e) {
+	const btn = e.currentTarget;
+	var str = richTextBox1.value;
+	var str1 = "";
+	if(lastRTB1SelectionEnd == lastRTB1SelectionStart) {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		str1 += String(btn.textContent) + "()";
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+1;
+	} else {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		str1 += String(btn.textContent) + "(";
+		let j = 0;
+		for(let i = lastRTB1SelectionStart; i < lastRTB1SelectionEnd; i++, j++) str1 += String(str[i]);
+		str1 += ")";
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+2+j;
+	}
+	richTextBox1.value = str1;
+	richTextBox1.focus();
+}
+
+function keyBtnFuc2_Click(e) {
+	const btn = e.currentTarget;
+	var str = richTextBox1.value;
+	var str1 = "";
+	if(lastRTB1SelectionEnd == lastRTB1SelectionStart) {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		str1 += String(btn.textContent) + "(; )";
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+1;
+	} else {
+		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
+		str1 += String(btn.textContent) + "(";
+		let j = 0;
+		for(let i = lastRTB1SelectionStart; i < lastRTB1SelectionEnd; i++, j++) str1 += String(str[i]);
+		str1 += "; )";
+		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
+		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+3+j;
+	}
+	richTextBox1.value = str1;
+	richTextBox1.focus();
 }

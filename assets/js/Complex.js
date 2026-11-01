@@ -615,12 +615,13 @@ export default class Complex {
         
         //result = b.Mod(1);
         //result = b.Mod(1).Mul(Math.PI).Cos().Mul(-1).Sum(1).Div(2);
-        result = b.Mod(1).Pow(this.Ln().Pow(Complex.Div(1, z.Re)));
+        result = b.Mod(new Complex(1)).Pow(this.Ln().Pow(Complex.Div(1, z.Re))); //(b%1)^(ln(a)^(1÷Re(a)))
+        if(b.Mod(new Complex(1)).Abs() == 0) result = new Complex(0);
         //result = b.Mod(1).Pow(this.Log(b.Mod(1).Sum(Complex.Pow(z, b.Mod(1).Sum(z)))));
         //result = b.Mod(1).Pow(this.Ln().Pow(Complex.Sub(Math.E * 2, Complex.Pow(z.Re, b.Mod(1).Sum(1)))));
         //result = z.Log(z).Mul(Complex.Sub(1, b.Mod(1))).Sum(z.Mul(b.Mod(1)));
-        for(let i = 0; i < n && i < 1000 && Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs()); i++) result = this.Sub(0).Pow(result);
-        for(let i = 0; i < -n && i < 1000 && Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs()); i++) result = result.Log(this.Sum(0));
+        for(let i = 0; i < n && i < 1000 /*&& Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs())*/; i++) result = this.Sub(0).Pow(result); //!
+        for(let i = 0; i < -n && i < 1000 /*&& Number.isFinite(result.Abs()) && !Number.isNaN(result.Abs())*/; i++) result = result.Log(this.Sum(0)); //!
         return result; //y = Re(tetr(t; x+0.001) - tetr(t; x))/0.001
     }
 } //y = (cos(t)*x+sin(t)*2)^(cos(t)*2+sin(t)*x)

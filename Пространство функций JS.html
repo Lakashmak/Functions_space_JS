@@ -4,7 +4,7 @@
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Пространство функций</title>
-    <link rel='icon' type='image/jpeg' href = 'assets/img/Functions_space_logo.ico' id='linkicon'>
+    <link rel='icon' type='image/x-icon' href = 'assets/img/Functions_space_logo.ico' id='linkicon'>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body> <!--<body onload="draw();">-->
@@ -13,11 +13,12 @@
     <canvas id="pictureBox1" width="800" height="450"></canvas>
     
     <div id="info">
-        <div id="label2">Масштаб: 5<br>
-        X: 0<br>
-        Y: 0<br>
-        T: 0</div>
-    </div>
+        <div id="label2">Масштаб: 5
+            <br>X: 0
+            <br>Y: 0
+            <br>T: 0
+        </div> <!-- label2 -->
+    </div> <!-- info -->
     
     <div id="controls">
         <button id="button10">+</button><br>
@@ -45,8 +46,174 @@
             <div class="menuSlider">
                 <div id="groupBox1" class="slide">
                     <button id="button3">Обновить выражение</button><br>
-                    <textarea id="richTextBox1" rows="4" cols="30">y = sin(x^t)</textarea>
-                </div>
+                    <textarea id="richTextBox1" virtualkeyboardpolicy="manual">y = sin(x^t)</textarea><br> <!-- rows="4" cols="30" -->
+                    
+                    <div class="keyboard">
+                        <div id="keyTabs">
+                            <button id="keyTabBtn1" class="keyTabBtn">Основн.</button>
+                            <button id="keyTabBtn2" class="keyTabBtn">Арифм.</button>
+                            <button id="keyTabBtn3" class="keyTabBtn">Тригон.</button>
+                            <!--<button id="keyTabBtn4" class="keyTabBtn">Гиперб.</button>-->
+                            <button id="keyTabBtn4" class="keyTabBtn">Доп. зн.</button>
+                        </div>
+                        
+                        <div id="keyboardSlider">
+                            <div id="keyGroupBox1" class="keySlide"> <!-- Основн. -->
+                                <div class="keyRow keyRow1">
+                                    <button id="btnDot" class="keyButton keyButton1 keyBtnSym">.</button>
+                                    <button id="btn0" class="keyButton keyButton1 keyBtnSym">0</button>
+                                    <button id="btn1" class="keyButton keyButton1 keyBtnSym">1</button>
+                                    <button id="btn2" class="keyButton keyButton1 keyBtnSym">2</button>
+                                    <button id="btn3" class="keyButton keyButton1 keyBtnSym">3</button>
+                                    <button id="btn4" class="keyButton keyButton1 keyBtnSym">4</button>
+                                    <button id="btn5" class="keyButton keyButton1 keyBtnSym">5</button>
+                                    <button id="btn6" class="keyButton keyButton1 keyBtnSym">6</button>
+                                    <button id="btn7" class="keyButton keyButton1 keyBtnSym">7</button>
+                                    <button id="btn8" class="keyButton keyButton1 keyBtnSym">8</button>
+                                    <button id="btn9" class="keyButton keyButton1 keyBtnSym">9</button>
+                                    <button id="btnSemicolon" class="keyButton keyButton1 keyBtnSym">;</button>
+                                </div><div class="keyRow keyRow1">
+                                    <button id="btnPlus" class="keyButton keyButton1 keyBtnSym">+</button>
+                                    <button id="btnMinus" class="keyButton keyButton1 keyBtnSym">–</button>
+                                    <button id="btnMul" class="keyButton keyButton1 keyBtnSym">×</button>
+                                    <button id="btnDiv" class="keyButton keyButton1 keyBtnSym">÷</button>
+                                    <button id="btnPow" class="keyButton keyButton1 keyBtnSym">^</button>
+                                    <button id="btnFct" class="keyButton keyButton1 keyBtnSym">!</button>
+                                    <button id="btnLes" class="keyButton keyButton1 keyBtnSym"><</button>
+                                    <button id="btnEq" class="keyButton keyButton1 keyBtnSym">=</button>
+                                    <button id="btnLar" class="keyButton keyButton1 keyBtnSym">></button>
+                                    <button id="btnNot" class="keyButton keyButton1 keyBtnSym">¬</button>
+                                    <button id="btnAnd" class="keyButton keyButton1 keyBtnSym">∧</button>
+                                    <button id="btnOr" class="keyButton keyButton1 keyBtnSym">∨</button>
+                                </div><div class="keyRow keyRow1">
+                                    <button id="btnOp" class="keyButton keyButton1 keyBtnSym">(</button>
+                                    <button id="btnCls" class="keyButton keyButton1 keyBtnSym">)</button>
+                                    <button id="btnRoot" class="keyButton keyButton1 keyBtnSym">√</button>
+                                    <button id="btnMod" class="keyButton keyButton1 keyBtnSym">%</button>
+                                    <button id="btnGmod" class="keyButton keyButton1 keyBtnSym">g%</button>
+                                    <button id="btnCeilOp" class="keyButton keyButton1 keyBtnSym">⌈</button>
+                                    <button id="btnCeilCls" class="keyButton keyButton1 keyBtnSym">⌉</button>
+                                    <button id="btnRoundOp" class="keyButton keyButton1 keyBtnSym">[</button>
+                                    <button id="btnRoundCls" class="keyButton keyButton1 keyBtnSym">]</button>
+                                    <button id="btnFloorOp" class="keyButton keyButton1 keyBtnSym">⌊</button>
+                                    <button id="btnFloorCls" class="keyButton keyButton1 keyBtnSym">⌋</button>
+                                    <button id="btnAbs" class="keyButton keyButton1 keyBtnSym">|</button>
+                                </div><div class="keyRow keyRow1">
+                                    <button id="btnDelete" class="keyButtonsSpecial">⌦</button>
+                                    <button id="btnX" class="keyButton keyButton1 keyBtnSym">x</button>
+                                    <button id="btnY" class="keyButton keyButton1 keyBtnSym">y</button>
+                                    <button id="btnC" class="keyButton keyButton1 keyBtnSym">c</button>
+                                    <button id="btnR" class="keyButton keyButton1 keyBtnSym">r</button>
+                                    <button id="btnTeta" class="keyButton keyButton1 keyBtnSym">θ</button>
+                                    <button id="btnT" class="keyButton keyButton1 keyBtnSym">t</button>
+                                    <button id="btnPi" class="keyButton keyButton1 keyBtnSym">π</button>
+                                    <button id="btnE" class="keyButton keyButton1 keyBtnSym">e</button>
+                                    <button id="btnI" class="keyButton keyButton1 keyBtnSym">i</button>
+                                    <button id="btnInfinity" class="keyButton keyButton1 keyBtnSym">∞</button>
+                                    <button id="btnBackSpace" class="keyButtonsSpecial">⌫</button>
+                                </div><div class="keyRow keyRow1">
+                                    <button id="btnKeyboard" class="keyButtonsSpecial">⌨</button>
+                                    <button id="btnLeft" class="keyButtonsSpecial">‹</button>
+                                    <button id="btnSpace" class="keyButtonsSpecial">␣</button>
+                                    <button id="btnRight" class="keyButtonsSpecial">›</button>
+                                    <button id="btnEnter" class="keyButtonsSpecial">↵</button>
+                                </div> <!-- keyRow -->
+                            </div> <!-- keyGroupBox1 -->
+                            
+                            <div id="keyGroupBox2" class="keySlide"> <!-- Арифм. -->
+                                <div class="keyRow keyRow2">
+                                    <button id="btnRoot" class="keyButton keyButton2 keyBtnFuc2">root</button>
+                                    <button id="btnMin" class="keyButton keyButton2 keyBtnFuc2">min</button>
+                                    <button id="btnRe" class="keyButton keyButton2 keyBtnFuc1">Re</button>
+                                </div><div class="keyRow keyRow2">
+                                    <button id="btnLn" class="keyButton keyButton2 keyBtnFuc1">ln</button>
+                                    <button id="btnMax" class="keyButton keyButton2 keyBtnFuc2">max</button>
+                                    <button id="btnIm" class="keyButton keyButton2 keyBtnFuc1">Im</button>
+                                </div><div class="keyRow keyRow2">
+                                    <button id="btnLg" class="keyButton keyButton2 keyBtnFuc1">lg</button>
+                                    <button id="btnSgn" class="keyButton keyButton2 keyBtnFuc1">sign</button>
+                                    <button id="btnConj" class="keyButton keyButton2 keyBtnFuc1">conj</button>
+                                </div><div class="keyRow keyRow2">
+                                    <button id="btnLog" class="keyButton keyButton2 keyBtnFuc2">log</button>
+                                    <button id="btnLcm" class="keyButton keyButton2 keyBtnFuc2">lcm</button>
+                                    <button id="btnArg" class="keyButton keyButton2 keyBtnFuc1">arg</button>
+                                </div><div class="keyRow keyRow2">
+                                    <button id="btnTetr" class="keyButton keyButton2 keyBtnFuc2">tetr</button>
+                                    <button id="btnGcd" class="keyButton keyButton2 keyBtnFuc2">gcd</button>
+                                    <button id="btnDrct" class="keyButton keyButton2 keyBtnFuc1">expi</button>
+                                </div> <!-- keyRow -->
+                            </div> <!-- keyGroupBox2 -->
+                            
+                            <div id="keyGroupBox3" class="keySlide"> <!-- Тригон. -->
+                                <div class="keyRow keyRow3">
+                                    <button id="btnSin" class="keyButton keyButton3 keyBtnFuc1">sin</button>
+                                    <button id="btnAsin" class="keyButton keyButton3 keyBtnFuc1">arcsin</button>
+                                    <button id="btnSh" class="keyButton keyButton3 keyBtnFuc1">sinh</button>
+                                    <button id="btnAsh" class="keyButton keyButton3 keyBtnFuc1">arcsinh</button>
+                                </div><div class="keyRow keyRow3">
+                                    <button id="btnCos" class="keyButton keyButton3 keyBtnFuc1">cos</button>
+                                    <button id="btnAcos" class="keyButton keyButton3 keyBtnFuc1">arccos</button>
+                                    <button id="btnCh" class="keyButton keyButton3 keyBtnFuc1">cosh</button>
+                                    <button id="btnAch" class="keyButton keyButton3 keyBtnFuc1">arccosh</button>
+                                </div><div class="keyRow keyRow3">
+                                    <button id="btnTan" class="keyButton keyButton3 keyBtnFuc1">tan</button>
+                                    <button id="btnAtan" class="keyButton keyButton3 keyBtnFuc1">arctan</button>
+                                    <button id="btnTh" class="keyButton keyButton3 keyBtnFuc1">tanh</button>
+                                    <button id="btnAth" class="keyButton keyButton3 keyBtnFuc1">arctanh</button>
+                                </div><div class="keyRow keyRow3">
+                                     <button id="btnCtg" class="keyButton keyButton3 keyBtnFuc1">ctg</button>
+                                     <button id="btnActg" class="keyButton keyButton3 keyBtnFuc1">arcctg</button>
+                                    <button id="btnCth" class="keyButton keyButton3 keyBtnFuc1">ctgh</button>
+                                    <button id="btnActh" class="keyButton keyButton3 keyBtnFuc1">arcctgh</button>
+                                </div><div class="keyRow keyRow3">
+                                    <button id="btnSec" class="keyButton keyButton3 keyBtnFuc1">sec</button>
+                                    <button id="btnAsec" class="keyButton keyButton3 keyBtnFuc1">arcsec</button>
+                                    <button id="btnSech" class="keyButton keyButton3 keyBtnFuc1">sech</button>
+                                    <button id="btnAsech" class="keyButton keyButton3 keyBtnFuc1">arcsech</button>
+                                </div><div class="keyRow keyRow3">
+                                    <button id="btnCsc" class="keyButton keyButton3 keyBtnFuc1">csc</button>
+                                    <button id="btnAcsc" class="keyButton keyButton3 keyBtnFuc1">arccsc</button>
+                                    <button id="btnCsch" class="keyButton keyButton3 keyBtnFuc1">csch</button>
+                                    <button id="btnAcsch" class="keyButton keyButton3 keyBtnFuc1">arccsch</button>
+                                </div> <!-- keyRow -->
+                            </div> <!-- keyGroupBox3 -->
+                            
+                            <div id="keyGroupBox4" class="keySlide"> <!-- Гиперб. -->
+                                <div class="keyRow keyRow4">
+                                    <button id="btnAndFunc" class="keyButton keyButton4 keyBtnFuc2">and</button>
+                                    <button id="btnOrFunc" class="keyButton keyButton4 keyBtnFuc2">or</button>
+                                    <button id="btnUeq" class="keyButton keyButton4 keyBtnSym">⇔</button>
+                                    <button id="btnMulD" class="keyButton keyButton4 keyBtnSym">·</button>
+                                    <button id="btnComplex" class="keyButton keyButton4 keyBtnFuc2">Complex</button>
+                                </div><div class="keyRow keyRow4">
+                                    <button id="btnLesEq" class="keyButton keyButton4 keyBtnSym">≤</button>
+                                    <button id="btnLarEq" class="keyButton keyButton4 keyBtnSym">≥</button>
+                                    <button id="btnDivd" class="keyButton keyButton4 keyBtnSym">⋮</button>
+                                    <button id="btnTrue" class="keyButton keyButton4 keyBtnSym">⊤</button>
+                                    <button id="btnFalse" class="keyButton keyButton4 keyBtnSym">⊥</button>
+                                </div><div class="keyRow keyRow4">
+                                    <button id="btnDeq" class="keyButton keyButton4 keyBtnSym">↔</button>
+                                    <button id="btnSumFunc" class="keyButton keyButton4 keyBtnFuc2">sum</button>
+                                    <button id="btnMulFunc" class="keyButton keyButton4 keyBtnFuc2">mul</button>
+                                    <button id="btnModFunc" class="keyButton keyButton4 keyBtnFuc2">mod</button>
+                                    <button id="btnGmodFunc" class="keyButton keyButton4 keyBtnFuc2">gmod</button>
+                                </div><div class="keyRow keyRow4">
+                                    <button id="btnExp" class="keyButton keyButton4 keyBtnFuc1">exp</button>
+                                    <button id="btnSqrtFunc" class="keyButton keyButton4 keyBtnFuc1">sqrt</button>
+                                    <button id="btnEqFunc" class="keyButton keyButton4 keyBtnFuc2">eq</button>
+                                    <button id="btnNaN" class="keyButton keyButton4 keyBtnSym">NaN</button>
+                                    <button id="btnSharp" class="keyButton keyButton4 keyBtnSym">#</button>
+                                </div> <!-- keyRow -->
+                            </div> <!-- keyGroupBox4 -->
+                            
+                            <!--<div id="keyGroupBox5" class="keySlide"> <!-- Доп. зн. - ->
+                                <div class="keyRow keyRow5">
+                                </div><div class="keyRow keyRow5">
+                                </div> <!-- keyRow - ->
+                            </div> <!-- keyGroupBox5 - -> -->
+                        </div> <!-- keyboardSlider -->
+                    </div> <!-- keyboard -->
+                </div> <!-- groupBox1 -->
                 
                 <div id="groupBox2" class="slide">
                     <button id="button2">Обновить положение</button><br>
@@ -74,17 +241,17 @@
                     <button id="button12">Вернуть положение по умолчанию</button><br>
 
                     <br><div id="label1">R: 0</div>
-                </div>
+                </div> <!-- groupBox2 -->
                 
                 <div id="groupBox3" class="slide">
                     <input type="checkbox" id="checkBox1"><label for="checkBox1">Скрыть кнопки масштабирования</label><br>
                     <input type="checkbox" id="checkBox2"><label for="checkBox2">Скрыть отображение координат в левом верхнем углу</label><br>
                     <input type="checkbox" id="checkBox3"><label for="checkBox3">Скрыть кнопки в левом нижнем углу</label><br>
                     <input type="checkbox" id="checkBox4"><label for="checkBox4">Скрыть координатную сетку</label><br>
-                </div>
-            </div>
-        </div>
-    </div>
+                </div> <!-- groupBox3 -->
+            </div> <!-- menuSlider -->
+        </div> <!-- menuWindow -->
+    </div> <!-- menu -->
 
     <!-- <div class="container"></div> -->
 
