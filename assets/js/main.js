@@ -1,77 +1,64 @@
 import Complex from './Complex.js';
+import Parser, { Operation } from './Parser.js';
+import Keyboard from './Keyboard.js';
 
-class Operation {
-    constructor(name, args, operations) {
-        this.name = name;
-        this.args = args;
-        this.variability = 3;
-        for(var j = 0; ((j < this.args.length) && (this.variability != 0)); j++) {
-            const arg = args[j];
-            if (arg[0] == '#' /*&& arg.length > 1*/) {
-                var id = ""; for (let i = 1; i < arg.length; i++) id += String(arg[i]);
-                const op = operations[Math.floor(id)];
-                if(op.variability < this.variability) this.variability = op.variability;
-            } //arg[0]
-            else if (arg == 'c' || arg == 'y' || arg == 'r' || arg == 'θ') this.variability = 0;
-            else if (arg == 'x') { if(1 < this.variability) this.variability = 1; }
-            else if (arg == 't') if(2 < this.variability) this.variability = 2;
-            //else if (arg[0] == 'p' || arg[0] == 'e' || arg[0] == 'i') if(2 < this.variability) this.variability = 2;
-            //else if(2 < this.variability) this.variability = 2;
-        }
-        this.relevance = false;
-        this.value = new Complex(1);
-    }
-}
 
-const pictureBox1 = document.getElementById('pictureBox1');
-const info = document.getElementById('info');
-const controls = document.getElementById('controls');
-const menu = document.getElementById('menu');
-const menuToolbar = document.getElementById('menuToolbar');
-const stretchArea = document.getElementById('stretchArea');
-const groupBox1 = document.getElementById('groupBox1');
-const groupBox2 = document.getElementById('groupBox2');
-const groupBox3 = document.getElementById('groupBox3');
-const label1 = document.getElementById('label1');
-const label2 = document.getElementById('label2');
-const richTextBox1 = document.getElementById('richTextBox1');
-const textBox1 = document.getElementById('textBox1');
-const textBox2 = document.getElementById('textBox2');
-const textBox3 = document.getElementById('textBox3');
-const textBox4 = document.getElementById('textBox4');
-const button1 = document.getElementById('button1');
-const button2 = document.getElementById('button2');
-const button3 = document.getElementById('button3');
-const button4 = document.getElementById('button4');
-const button5 = document.getElementById('button5');
-const button6 = document.getElementById('button6');
-const button7 = document.getElementById('button7');
-const button8 = document.getElementById('button8');
-const button9 = document.getElementById('button9');
-const button10 = document.getElementById('button10');
-const button11 = document.getElementById('button11');
-const button12 = document.getElementById('button12');
-const checkBox1 = document.getElementById('checkBox1');
-const checkBox2 = document.getElementById('checkBox2');
-const checkBox3 = document.getElementById('checkBox3');
-const checkBox4 = document.getElementById('checkBox4');
-const keyBtnSym = document.querySelectorAll('.keyBtnSym');
-const btnBackSpace = document.getElementById('btnBackSpace');
-const btnDelete = document.getElementById('btnDelete');
-const btnSpace = document.getElementById('btnSpace');
-const btnEnter = document.getElementById('btnEnter'); 
-const btnLeft = document.getElementById('btnLeft');
-const btnRight = document.getElementById('btnRight');
-const btnKeyboard = document.getElementById('btnKeyboard');
-const keyTabBtn1 = document.getElementById('keyTabBtn1');
-const keyTabBtn2 = document.getElementById('keyTabBtn2');
-const keyTabBtn3 = document.getElementById('keyTabBtn3');
-const keyTabBtn4 = document.getElementById('keyTabBtn4');
-//const keyTabBtn5 = document.getElementById('keyTabBtn5');
-const keyGroupBox1 = document.getElementById('keyGroupBox1');
-const keySlide = document.querySelectorAll('.keySlide');
-const keyBtnFuc1 = document.querySelectorAll('.keyBtnFuc1');
-const keyBtnFuc2 = document.querySelectorAll('.keyBtnFuc2');
+//ЭЛЕМЕНТЫ УПРАВЛЕНИЯ:
+
+const pictureBox1 = document.getElementById('pictureBox1'); //главный элемент на котором отрисовываются графики функций
+const info = document.getElementById('info'); //координаты в левом верхнем углу
+const controls = document.getElementById('controls'); //кнопки масштабирования
+const menu = document.getElementById('menu'); //выдвигаемое меню
+const menuToolbar = document.getElementById('menuToolbar'); //кнопки скрыть и анимация в шапке меню
+const stretchArea = document.getElementById('stretchArea'); //область перетаскивания для растягивания меню
+const groupBox1 = document.getElementById('groupBox1'); //вкладка "Выражение" в меню
+const groupBox2 = document.getElementById('groupBox2'); //вкладка "Положение" в меню
+const groupBox3 = document.getElementById('groupBox3'); //вкладка "Настройки" в меню
+const label1 = document.getElementById('label1'); //строка вывода расстояния до функции в точке в центре экрана на вкладке "Положение" в меню
+const label2 = document.getElementById('label2'); //строка вывода координат в левом верхнем углу экрана
+const richTextBox1 = document.getElementById('richTextBox1'); //текстовое поле ввода выражения
+const textBox1 = document.getElementById('textBox1'); //поле ввода масштаба на вкладке "Положение" в меню
+const textBox2 = document.getElementById('textBox2'); //поле ввода координаты x на вкладке "Положение" в меню
+const textBox3 = document.getElementById('textBox3'); //поле ввода координаты y на вкладке "Положение" в меню
+const textBox4 = document.getElementById('textBox4'); //поле ввода переменной t на вкладке "Положение" в меню
+const button1 = document.getElementById('button1'); //кнопка "Анимация" в шапке меню
+const button2 = document.getElementById('button2'); //кнопка "Обновить положение" на вкладке "Положение" в меню
+const button3 = document.getElementById('button3'); //кнопка "Обновить выражение" на вкладке "Выражение" в меню
+const button4 = document.getElementById('button4'); //кнопка "Меню" в левом нижнем углу экрана
+const button5 = document.getElementById('button5'); //кнопка "Скрыть" в шапке меню
+const button6 = document.getElementById('button6'); //кнопка "Анимация" в левом нижнем углу экрана
+const button7 = document.getElementById('button7'); //кнопка "Выражение" в переключении вкладок в меню
+const button8 = document.getElementById('button8'); //кнопка "Положение" в переключении вкладок в меню
+const button9 = document.getElementById('button9'); //кнопка "Настройки" в переключении вкладок в меню
+const button10 = document.getElementById('button10'); //кнопка "+" для масштабирования на правой стороне экрана
+const button11 = document.getElementById('button11'); //кнопка "–" для масштабирования на правой стороне экрана
+const button12 = document.getElementById('button12'); //кнопка "Вернуть положение по умолчанию" на вкладке "Положение" в меню
+const checkBox1 = document.getElementById('checkBox1'); //настройка "Скрыть кнопки масштабирования"
+const checkBox2 = document.getElementById('checkBox2'); //настройка "Скрыть отображение координат в левом верхнем углу"
+const checkBox3 = document.getElementById('checkBox3'); //настройка "Скрыть кнопки в левом нижнем углу"
+const checkBox4 = document.getElementById('checkBox4'); //настройка "Скрыть координатную сетку"
+const keyboard1 = document.getElementById('keyboard1'); new Keyboard(richTextBox1, keyboard1);
+const button13 = document.getElementById('button13');
+const menuTabBtn = document.querySelectorAll('.menuTabBtn');
+const richTextBox2 = document.getElementById('richTextBox2');
+const textBox5 = document.getElementById('textBox5');
+const keyboard2 = document.getElementById('keyboard2'); new Keyboard(richTextBox2, keyboard2);
+const keyboardSlider = document.querySelectorAll('keyboardSlider');
+const key2Buttons = keyboard2.querySelectorAll('.keyButton, .keyButtonsSpecial');
+const label3 = document.getElementById('label3');
+const checkBox5 = document.getElementById('checkBox5');
+const textBox6 = document.getElementById('textBox6');
+const button14 = document.getElementById('button14');
+const button15 = document.getElementById('button15');
+const textBox7 = document.getElementById('textBox7');
+const button16 = document.getElementById('button16');
+const button17 = document.getElementById('button17');
+const textBox8 = document.getElementById('textBox8');
+const button18 = document.getElementById('button18');
+const button19 = document.getElementById('button19');
+
+
+//СОБЫТИЯ:
 
 window.addEventListener('resize', resizeCanvas);
 pictureBox1.addEventListener('wheel', (e) => {MouseWheel(e);});
@@ -88,7 +75,7 @@ pictureBox1.addEventListener('touchend', (e) => {pictureBox1_MouseUp(e);});
 pictureBox1.addEventListener('touchcancel', (e) => {pictureBox1_MouseUp(e);});
 button4.addEventListener('click', () => {button4_Click();});
 button5.addEventListener('click', () => {button5_Click();});
-button6.addEventListener('click', () => {button1_Click();});
+button6.addEventListener('click', () => {button1_Click();}); //ссылка ну обработчик другой кнопки
 button7.addEventListener('click', () => {button7_Click();});
 button8.addEventListener('click', () => {button8_Click();});
 button9.addEventListener('click', () => {button9_Click();});
@@ -107,75 +94,77 @@ checkBox2.addEventListener('change', () => {checkBox2_Click();});
 checkBox3.addEventListener('change', () => {checkBox3_Click();});
 button12.addEventListener('click', () => {button12_Click();});
 checkBox4.addEventListener('change', () => {checkBox4_Click();});
-keyBtnSym.forEach(kBtn => {kBtn.addEventListener('click', (e) => {keyBtnSym_Click(e);});});
-richTextBox1.addEventListener('blur', () => {rtb1Selection = false; lastRTB1SelectionStart = richTextBox1.selectionStart; lastRTB1SelectionEnd = richTextBox1.selectionEnd; richTextBox1.virtualKeyboardPolicy = 'manual';});
-richTextBox1.addEventListener('focus', () => {rtb1Selection = true; richTextBox1.setSelectionRange(lastRTB1SelectionStart, lastRTB1SelectionEnd);});
-btnBackSpace.addEventListener('click', () => {btnBackSpace_Click();});
-btnDelete.addEventListener('click', () => {btnDelete_Click();});
-btnSpace.addEventListener('click', () => {btnSpace_Click();});
-btnEnter.addEventListener('click', () => {btnEnter_Click();});
-btnLeft.addEventListener('click', () => {btnLeft_Click();});
-btnRight.addEventListener('click', () => {btnRight_Click();});
-btnKeyboard.addEventListener('click', () => {btnKeyboard_Click();});
-keyTabBtn1.addEventListener('click', () => {keyTabBtn1_Click();});
-keyTabBtn2.addEventListener('click', () => {keyTabBtn2_Click();});
-keyTabBtn3.addEventListener('click', () => {keyTabBtn3_Click();});
-keyTabBtn4.addEventListener('click', () => {keyTabBtn4_Click();});
-//keyTabBtn5.addEventListener('click', () => {keyTabBtn5_Click();});
-keyBtnFuc1.forEach(kBtn => {kBtn.addEventListener('click', (e) => {keyBtnFuc1_Click(e);});});
-keyBtnFuc2.forEach(kBtn => {kBtn.addEventListener('click', (e) => {keyBtnFuc2_Click(e);});});
+button13.addEventListener('click', () => {button13_Click();});
+richTextBox2.addEventListener('input', () => {richTextBox2_TextChanged();});
+key2Buttons.forEach(k2b => {k2b.addEventListener('click', () => {requestAnimationFrame(() => {richTextBox2_TextChanged();});});});
+checkBox5.addEventListener('change', () => {checkBox5_Click();});
+button14.addEventListener('click', () => {button14_Click();});
+button15.addEventListener('click', () => {button15_Click();});
+button16.addEventListener('click', () => {button16_Click();});
+button17.addEventListener('click', () => {button17_Click();});
+button18.addEventListener('click', () => {button18_Click();});
+button19.addEventListener('click', () => {button19_Click();});
 
-//checkBox.addEventListener('change', () => { console.log('changed', checkBox.id, checkBox.checked); this.checkBox_Click(checkBox, "lang", l.id); });
 
-var gr;
+//ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ:
 
-var cRe = -1, cIm = 0;
+var gr; //графический отрисовщик
+//var cRe = -1, cIm = 0;
 //var Cmode = 1;
-var m = 0;
-var Lx = 0, Ly = 0, Lx2 = 0, Ly2 = 0;
-var dx = 0, dy = 0, dx2 = 0, dy2 = 0;
-var k = 51;
+var m = 0; //размер отрисовывающегося пикселя
+var Lx = 0, Ly = 0, Lx2 = 0, Ly2 = 0; //координаты нажатия на экран в предыдущем кадре
+var dx = 0, dy = 0, dx2 = 0, dy2 = 0; //координаты нажатия на экран в новом кадре
+var k = 51; //масштаб
 //var sk = k;
-var sx = 0, sy = 0;
+var sx = 0, sy = 0; //координаты камеры в пространстве
 //var ssx = 0; //var ssy = 0;
-var x = 0, y = 0;
-let dC = false;
+var x = 0, y = 0; //координаты текущего пикселя на экране в цикле отрисовки
+//let dC = false;
 //var sn = 2;
-var t = 0, dt = 0.1;
-var dist = "загрузка...";
-let animation = false;
-var buttontype = -1;
-var operations = [];
-var fValue = "";
-var timer1Interval = 1;
-let touchWheel = false;
-var c;
-var Lm = 0;
-let displayGrid = true;
-let rtb1Selection = false;
-let lastRTB1SelectionStart = richTextBox1.value.length;
-let lastRTB1SelectionEnd = richTextBox1.value.length;
-//let virtualKeyboard = false;
+var t = 0, dt = 0.025; /*dt = 0.1;*/ //переменная времени для анамации и шага анимации;
+var dist = "загрузка..."; //отображаемое значение расстояния до функции в точке по координатам в центре экрана
+let animation = false; //запущена ли анимация
+var buttontype = -1; //тип кнопки мыши
+var parser; //var operations = []; //последовательность операций для вычисления
+var parser2;
+var fValue = ""; //ссылка на переменную результата расчёта последовательности операций
+var fValue2 = "";
+var timer1Interval = 1; //интервал таймера 
+let touchWheel = false; //масштабирование пальцами
+var c; //комплексное значение точки в пространстве вычесленное по координатам в текущий момент отрисовки
+var Lm = 0; //координата нажатия на экран при изменении размера меню
+let displayGrid = true; //отображение координатной сетки
+var lastTime = 0;
+var fps = 0;
+let dm = 175;
 
 
+//НАЧАЛЬНОЕ ОТОБРАЖЕНИЕ:
+
+parser = new Parser();
+parser2 = new Parser();
+fValue = parser.Recognition(String(richTextBox1.value)); //console.log(operations);
+fValue2 = parser2.Recognition(String(richTextBox2.value));
 resizeCanvas();
-fValue = Recognition(String(richTextBox1.value)); //console.log(operations);
 gr = pictureBox1.getContext('2d');
 gr.fillStyle = 'rgb(255, 127, 0)';
 gr.clearRect(0, 0, pictureBox1.width, pictureBox1.height); //gr.clearRect(0, 0, 930, 900);
 setInterval(timer1_Tick, timer1Interval);
 //requestAnimationFrame(this.Draw.bind(this));
 
-function resizeCanvas() {
+
+//ОБРАБОТЧИКИ ОСНОВНЫХ СОБЫТИЙ:
+
+function resizeCanvas() { //масштаборование или поворот экрана
     pictureBox1.width = window.innerWidth;
     pictureBox1.height = window.innerHeight;
     if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
     gr = pictureBox1.getContext('2d');
     mReset();
-    keyboardSlider.style.height = `${((keyboardSlider.offsetWidth-10)/12*5)+25}px`;`${((keyboardSlider.offsetWidth-10)/12*5)+25}px`;
+    keyboardSlider.forEach(kbs => {kbs.style.height = `${((kbs.offsetWidth-10)/12*5)+25}px`;`${((kbs.offsetWidth-10)/12*5)+25}px`;}); 
 }
 
-function MouseWheel(e) {
+function MouseWheel(e) { //вращение колёсиком мыши
     if (e.deltaY < 0) k *= 1.35;
     else k /= 1.35;
     textBox1.value = 255 / k;
@@ -183,30 +172,34 @@ function MouseWheel(e) {
     mReset();
 }
 
-function button10_Click() {
+function button10_Click() { //нажатие на кнопку "+" 
 	k *= 1.35;
 	textBox1.value = 255 / k;
 	infoUpdate();
 	mReset();
 }
 
-function button11_Click() {
+function button11_Click() { //нажатие на кнопку "–" 
 	k /= 1.35;
 	textBox1.value = 255 / k;
 	infoUpdate();
 	mReset();
 }
 
-function button2_Click() {
-    k = 255 / parseFloat(textBox1.value);
-    sx = parseFloat(textBox2.value)
-    sy = -parseFloat(textBox3.value);
-    t = parseFloat(textBox4.value);
+function button2_Click() { //нажатие на кнопку "Обновить положение"
+    k = 255 / parseFloat(autocorrect(textBox1.value));
+    sx = parseFloat(autocorrect(textBox2.value))
+    sy = -parseFloat(autocorrect(textBox3.value));
+    t = parseFloat(autocorrect(textBox4.value));
+    textBox1.value = 255 / k;
+    textBox2.value = sx;
+    textBox3.value = -sy;
+    textBox4.value = t;
     mReset();
     infoUpdate();
 }
 
-function pictureBox1_MouseDown(e) {
+function pictureBox1_MouseDown(e) { //опускание кнопки мыши при нажатии на pictureBox1
     buttontype = e.button
 
     if (e.button === 0) { // Левая кнопка мыши
@@ -223,9 +216,9 @@ function pictureBox1_MouseDown(e) {
     //         element.style.display = element.style.display === 'none' ? '' : 'none';
     //     });
     // }
-}
+} //pictureBox1_MouseDown
 
-function pictureBox1_TouchDown(e) {
+function pictureBox1_TouchDown(e) { //опускание пальца при нажатии на pictureBox1
     buttontype = 0;
 
     const rect = e.target.getBoundingClientRect();
@@ -248,13 +241,13 @@ function pictureBox1_TouchDown(e) {
     //         element.style.display = element.style.display === 'none' ? '' : 'none';
     //     });
     // }
-}
+} //pictureBox1_TouchDown
 
-function pictureBox1_MouseUp(e){
+function pictureBox1_MouseUp(e){ //поднятие кнопки мыши или пальца с pictureBox1
     buttontype = -1;
 }
 
-function pictureBox1_MouseMove(e) {
+function pictureBox1_MouseMove(e) { //перемещение мыши по pictureBox1
     if (buttontype === 0) {
         const rect = e.target.getBoundingClientRect();
         dx = e.clientX - rect.left; 
@@ -263,8 +256,8 @@ function pictureBox1_MouseMove(e) {
         sx += (Lx - dx) / k;
         // if (!dC && Cmode === 1)
         sy += (Ly - dy) / k;
-        if (dC) cRe += (Lx - dx) / k;
-        if (dC) cIm += (Ly - dy) / k;
+        //if (dC) cRe += (Lx - dx) / k;
+        //if (dC) cIm += (Ly - dy) / k;
         Lx = dx;
         Ly = dy;
         mReset();
@@ -272,9 +265,9 @@ function pictureBox1_MouseMove(e) {
         textBox3.value = -sy;
         infoUpdate();
     }
-}
+} //pictureBox1_MouseMove
 
-function pictureBox1_TouchMove(e) {
+function pictureBox1_TouchMove(e) { //перемещение пальца по pictureBox1
     //e.preventDefault();
     if (buttontype === 0) {
         const rect = e.target.getBoundingClientRect();
@@ -285,8 +278,8 @@ function pictureBox1_TouchMove(e) {
             sx += (Lx - dx) / k;
             // if (!dC && Cmode === 1)
             sy += (Ly - dy) / k;
-            if (dC) cRe += (Lx - dx) / k;
-            if (dC) cIm += (Ly - dy) / k;
+            //if (dC) cRe += (Lx - dx) / k;
+            //if (dC) cIm += (Ly - dy) / k;
         }
         else {
             dx2 = e.touches[1].clientX - rect.left; 
@@ -295,8 +288,8 @@ function pictureBox1_TouchMove(e) {
             sx += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
             // if (!dC && Cmode === 1)
             sy += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
-            if (dC) cRe += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
-            if (dC) cIm += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
+            //if (dC) cRe += ((Lx - dx) + (Lx2 - dx2)) / k / 2;
+            //if (dC) cIm += ((Ly - dy) + (Ly2 - dy2)) / k / 2;
             k /= new Complex(Lx, Ly).Sub(new Complex(Lx2, Ly2)).Abs() / new Complex(dx, dy).Sub(new Complex(dx2, dy2)).Abs();
             Lx2 = dx2;
             Ly2 = dy2;
@@ -309,19 +302,21 @@ function pictureBox1_TouchMove(e) {
         textBox3.value = -sy;
         infoUpdate();
     }
-}
+} //pictureBox1_TouchMove
 
-function infoUpdate() {
-	label2.innerText = `Масштаб: ${255 / k}
-        X: ${sx}
-        Y: ${-sy}
-        T: ${t}`;
-}
-
-function timer1_Tick() {
+function timer1_Tick() { //тик таймера
     //gr = pictureBox1.getContext('2d');
     //d++; if (d > 25) d = 0;
     label1.innerText = "R: " + dist;
+    
+    //if(checkBox5.checked) {
+    	var newTime = Date.now();
+        var newFPS = 1000.0 / (newTime - lastTime);
+        if(fps == 0) fps = newFPS;
+        fps = (fps*Math.ceil(newFPS-1) + newFPS) / Math.ceil(newFPS);
+        label3.innerText = "FPS: " + Math.round(fps);
+        lastTime = newTime;
+    //}
     
     Draw();
     if (animation)
@@ -329,33 +324,51 @@ function timer1_Tick() {
         t += dt;
         textBox4.value = t;
         infoUpdate();
-        operations.forEach(function(op) { if(op.variability <= 2) op.relevance = false; });
+        parser.operations.forEach(op => { if(op.variability <= 2) op.relevance = false; });
+        parser2.operations.forEach(op => { if(op.variability <= 2) op.relevance = false; });
+        var result = parser2.CalculationValue(fValue2, new Complex(sx, -sy), t);
+        writeComplex(textBox5, result);
     }
     //requestAnimationFrame(this.Draw.bind(this));
+} //timer1_Tick
+
+
+//ФУНКЦИИ:
+
+function infoUpdate() { //обновление информации в левом верхнем углу экрана
+	label2.innerText = `Масштаб: ${255 / k}
+        x: ${sx}
+        y: ${-sy}
+        t: ${t}`;
 }
 
-function mReset() { 
+function mReset() { //сброс прогресса отрисовки
     m = pictureBox1.width + pictureBox1.height;
     x = Math.floor(-pictureBox1.width / 2.0 - m / 2.0);
     y = Math.floor(-pictureBox1.height / 2.0 - m / 2.0);
-    operations.forEach(function(op) { if(op.variability <= 2) op.relevance = false; });
+    parser.operations.forEach(op => { if(op.variability <= 2) op.relevance = false; });
     dist = "загрузка...";
+    dist = parser.CalculationValue(fValue, new Complex(sx, -sy), t).Abs();
+    parser.operations.forEach(op => { if(op.variability <= 2) op.relevance = false; });
+    parser2.operations.forEach(op => { if(op.variability <= 2) op.relevance = false; });
+    var result = parser2.CalculationValue(fValue2, new Complex(sx, -sy), t);
+    writeComplex(textBox5, result);
 }
 
-function Draw() {
+function Draw() { //отрисовка
     gr = pictureBox1.getContext('2d');
-    if (!animation) {
+    if (!animation) { //статическая отрисовка методом улучшения качества со временем
         for (var i = 0; i < 2500; i++) {
             if (m >= 1) { 
                 if (x <= (pictureBox1.width / 2.0 + m)) { 
                     if (y <= (pictureBox1.height / 2.0 + m)) { 
-                        operations.forEach(function(op) { if(op.variability <= 0) op.relevance = false; });
+                        parser.operations.forEach(op => { if(op.variability <= 0) op.relevance = false; });
                         c = new Complex((x / k + sx), -(y / k + sy)); //!
                         gr.fillStyle = Calculation(); //textBox1.value = gr.fillStyle;
                         gr.fillRect(Math.floor(x + (pictureBox1.width / 2.0 - m / 2.0)), Math.floor(y + (pictureBox1.height / 2.0 - m / 2.0)), m, m); //gr.fillRect(x, y, width, height);
                         y += Math.floor(m);
                     } else {
-                        operations.forEach(function(op) { if(op.variability <= 1) op.relevance = false; });
+                        parser.operations.forEach(op => { if(op.variability <= 1) op.relevance = false; });
                         x += Math.floor(m);
                         y = Math.floor(-pictureBox1.height / 2.0 - m / 2.0);
                     }
@@ -366,15 +379,15 @@ function Draw() {
                 }
             }
         }
-    }
-    else if (m >= 1) {
-        m = (pictureBox1.width + pictureBox1.height) / 175; //300;
+    } //if (!animation)
+    else if (m >= 1) { //отрисовка во время анимации
+        m = (pictureBox1.width + pictureBox1.height) / dm; //175 //300; //!
         //const bitmap2 = document.createElement('canvas'); try { bitmap2.width = window.innerWidth / m; bitmap2.height = window.innerHeight / m; } catch { bitmap2.width = 1; bitmap2.height = 1; };
         for (var x1 = 0; x1 < window.innerWidth / m;  x1++) {
-            operations.forEach(function(op) { if(op.variability <= 1) op.relevance = false; });
+            parser.operations.forEach(op => { if(op.variability <= 1) op.relevance = false; });
             for (var y1 = 0; y1 < window.innerHeight / m; y1++)  
             {
-                operations.forEach(function(op) { if(op.variability <= 0) op.relevance = false; });
+                parser.operations.forEach(op => { if(op.variability <= 0) op.relevance = false; });
                 c = new Complex(((x1 - window.innerWidth / m / 2.0) / k * m + sx), -((y1 - window.innerHeight / m / 2.0) / k * m + sy));
                 gr.fillStyle = Calculation(); //pen.Color = col; //!
                 try { gr.fillRect(x1 * m, y1 * m, m + 1, m + 1); } catch { } //gr.FillRectangle(pen.Brush, Convert.ToInt32(x1), Convert.ToInt32(y1), (float)m, (float)m);
@@ -383,8 +396,8 @@ function Draw() {
         //m = 0;
         //gr.drawImage(bitmap2, 0, 0, pictureBox1.width, pictureBox1.height, 0, 0, bitmap2.width, bitmap2.height);
         //mReset();
-    }
-    if(displayGrid) {
+    } //if (animation)
+    if(displayGrid) { //отрисовка координатной сетки
     	//отрисовка основных линий сетки системы координат:
         gr.strokeStyle = "#7f7f7f";
         gr.lineWidth = 1;
@@ -460,10 +473,10 @@ function Draw() {
             gr.fillText(`${Math.round(-sy*rndK+j+1.5+adjY)/rndK}`, lineX, window.innerHeight / 2 - i + marginY);
         for (let i = locK + (sy % (locK/k)) * k, j = 0; i > -window.innerHeight / 2; i -= locK, j--)
             gr.fillText(`${Math.round(-sy*rndK+j+1.5+adjY)/rndK}`, lineX, window.innerHeight / 2 - i + marginY);
-    }
-}
+    } //if(displayGrid)
+} //Draw
 
-function drawLine(x1, y1, x2, y2) {
+function drawLine(x1, y1, x2, y2) { //метод рисования линии
     gr.beginPath();
     gr.moveTo(x1, y1);
     gr.lineTo(x2, y2);
@@ -472,441 +485,278 @@ function drawLine(x1, y1, x2, y2) {
 
 function Min(a,b) { return Math.abs(b)<Math.abs(a)?b:a; }
 function Max(a,b) { return Math.abs(b)>Math.abs(a)?b:a; }
-function button3_Click() {
-    operations = [];
-    fValue = Recognition(String(richTextBox1.value)); //console.log(operations);
+function button3_Click() { //нажатие на кнопку "Обновить выражение"
+    parser.clear();
+    fValue = parser.Recognition(String(richTextBox1.value)); //console.log(operations);
     mReset();
-}
-function Recognition(formula) {
-    formula = String(formula);
-    var multiexpression=false, ueq=false, Or=false, And=false, Not=false, Abs=false, equality=false, deq=false, Sum=false, Sub=false, Mul=false, Div=false, Pow=false, Root=false, Fct=false, Mod=false;
-    {
-        var level = 0, formula1 = "";
-        for (var i = 0; i < formula.length; i++) if (formula[i] != ' ') {
-            if (formula[i] == ',') formula1 += '.';
-            else if (formula[i] == 'π') formula1 += 'p';
-            else if (formula[i] == '−') formula1 += '-';
-            else if (formula[i] == '–') formula1 += '-';
-            else if (formula[i] == '—') formula1 += '-';
-            else if (formula[i] == ':') formula1 += '/';
-            else if (formula[i] == '÷') formula1 += '/';
-            else if (formula[i] == '×') formula1 += '*';
-            else if (formula[i] == '·') formula1 += '*';
-            else if (formula[i] == '≤') formula1 += '<';
-            else if (formula[i] == '≥') formula1 += '>';
-            else if (formula[i] == '&') formula1 += '∧';
-            else if (formula[i] == '≡') formula1 += '↔';
-            //else if (formula[i] == '↔') formula1 += '=';
-            //else if (formula[i] == '⇔') formula1 += '=';
-            else if (formula[i] == '[') formula1 += "round(";
-            else if (formula[i] == '⌊') formula1 += "Dround(";
-            else if (formula[i] == '⌈') formula1 += "Uround(";
-            else if (formula[i] == ']') formula1 += ')';
-            else if (formula[i] == '⌋') formula1 += ')';
-            else if (formula[i] == '⌉') formula1 += ')';
-            else if (formula[i] == '⋮') formula1 += '%';
-            else if (formula[i] == '⊤') formula1 += '0';
-            else if (formula[i] == '⊥') formula1 += '∞';
-
-            else formula1 += String(formula[i]);
-        }
-        formula = formula1;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if(formula[i] == ')') level--;
-            if(formula[i]=='\n') multiexpression = true;
-            if(level <= 0) {
-                if(['=', '>', '<'].includes(formula[i])) equality = true; //!
-                if(formula[i] == '↔') deq = true;
-                if(formula[i] == '⇔') ueq = true;
-                if(!Sub && formula[i] == '+') Sum = true;
-                if(!Sum && formula[i] == '-') Sub = true;
-                if(!Div && formula[i] == '*') Mul = true;
-                if(!Mul && formula[i] == '/') Div = true;
-                if(formula[i] == '%') Mod = true;
-                if(formula[i] == '^') Pow = true;
-                if(formula[i] == '√') Root = true;
-                if(formula[i] == '!') Fct = true;
-                if(formula[i] == '|') Abs = true;
-                if(formula[i] == '∨') Or = true;
-                if(formula[i] == '∧') And = true;
-                if(formula[i] == '¬') Not = true;
-            }
-        }
-    }
-
-    if (multiexpression) {
-        var level = 0, formula1 = "Or(";
-        for (var i = 0; i < formula.length; i++) {
-        	if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '\n') { if(formula[i] != '\n') formula1 += String(formula[i]); }
-            else formula1 += ";";
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Abs) {
-        var Open = false, level = 0, formula1 = "(";
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '|') formula1 += String(formula[i]);
-            else if (formula[i] == '|') {
-                if (!Open) formula1 += "Abs(";
-                else formula1 += ")";
-                Open = !Open;
-            }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (ueq) {
-        var level = 0, formula1 = "Eq(";
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '⇔') formula1 += String(formula[i]);
-            else formula1 += ";";
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Or) {
-        var level = 0, formula1 = "Or(";
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '∨') formula1 += String(formula[i]);
-            else formula1 += ";";
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (And) {
-        var level = 0, formula1 = "And(";
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '∧') formula1 += String(formula[i]);
-            else formula1 += ";";
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Not) {
-        var level = 0, formula1 = "", one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || !one || formula[i] != '¬') formula1 += formula[i];
-            else if (formula[i] == '¬') { formula1 += "Div(1;"; one = false; }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (equality) {
-        //bool larger = false;
-        //bool less = false;
-        var level = 0, formula1 = "Max(", args = [], types = "", arg = "";
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level >= 0) {
-                if (level > 0 || formula[i] != '=' && formula[i] != '>' && formula[i] != '<') arg += String(formula[i]);
-                else if (formula[i] == '=' || formula[i] == '>' || formula[i] == '<') {
-                    //if (formula[i] == '>') larger = true;
-                    //if (formula[i] == '<') less = true;
-                    //formula1 += ";";
-                    if(arg != "") types += String(formula[i]);
-                    if(arg != "") args.push(arg);
-                    arg = "";
-                }
-            }
-        }
-        if(arg != "") args.push(arg);
-        for (var i = 0; i < types.length; i++) {
-            if (types[i] == '=') formula1 += "Eq(" + args[i] + ";" + args[i + 1] + ")";
-            if (types[i] == '>') formula1 += "Lar(" + args[i] + ";" + args[i + 1] + ")";
-            if (types[i] == '<') formula1 += "Les(" + args[i] + ";" + args[i + 1] + ")";
-            if (i + 1 < types.length) formula1 += ";";
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (deq) {
-        var level = 0, formula1 = "Eq(";
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '↔') formula1 += String(formula[i]);
-            else formula1 += ";";
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Sum || Sub) {
-        var formula1 = ""; if (Sum) formula1 = "Sum("; if (Sub) formula1 = "Sub(";
-        var level = 0, one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '+' && formula[i] != '-') formula1 += String(formula[i]);
-            else if (one) { formula1 += ";"; one = false; }
-            else {
-                if (formula[i] == '+') formula1 = "Sum(" + formula1 + ");";
-                if (formula[i] == '-') formula1 = "Sub(" + formula1 + ");";
-            }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Mul || Div) {
-        var formula1 = ""; if (Mul) formula1 = "Mul("; if (Div) formula1 = "Div(";
-        var level = 0, one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || formula[i] != '*' && formula[i] != '/') formula1 += formula[i];
-            else if (one) { formula1 += ";"; one = false; }
-            else {
-                if (formula[i] == '*') formula1 = "Mul(" + formula1 + ");";
-                if (formula[i] == '/') formula1 = "Div(" + formula1 + ");";
-            }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Mod) {
-        var level = 0, formula1 = "", one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || !one || !['%', 'g', 'G'].includes(formula[i])) formula1 += formula[i];
-            else if (i > 0 && formula[i] == '%' && (formula[i-1] == 'g' || formula[i-1] == 'G')) { formula1 = "Gmod(" + formula1 + ";"; one = false; }
-            else if (formula[i] == '%') { formula1 = "Mod(" + formula1 + ";"; one = false; }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Pow) {
-        var level = 0, formula1 = "", one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || !one || formula[i] != '^') formula1 += formula[i];
-            else if (formula[i] == '^') { formula1 = "Pow(" + formula1 + ";"; one = false; }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Root) {
-        var level = 0, formula1 = "", one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || !one || formula[i] != '√') formula1 += formula[i];
-            else if (formula[i] == '√') { formula1 += "Sqrt("; one = false; }
-        }
-        formula1 += ")";
-        formula = formula1;
-    } else if (Fct) {
-        var level = 0, formula1 = "", one = true;
-        for (var i = 0; i < formula.length; i++) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0 || !one || formula[i] != '!') formula1 += formula[i];
-            else if (formula[i] == '!') { formula1 = "Mul(Fct(" + formula1 + ");"; one = false; }
-        }
-        formula1 += ")";
-        formula = formula1;
-    }
-
-    while (formula != "") {
-        var i = 0, operation = "";
-        while (i < formula.length && formula[i] != '(') operation += String(formula[i++]);
-        if (i >= formula.length) break;
-        var level = 1, argsStr = "";
-        i++;
-        while (i < formula.length && level > 0) {
-            if (formula[i] == '(') level++;
-            else if (formula[i] == ')') level--;
-            if (level > 0) argsStr += String(formula[i++]);
-        }
-        if (i >= formula.length || argsStr == "") break;
-        args = [];
-        {
-            var arg = "", level = 0;
-            for (var j = 0; j < argsStr.length; j++) {
-                if (argsStr[j] == '(') level++;
-                else if (argsStr[j] == ')') level--;
-                if (level >= 0) {
-                    if (level > 0 || argsStr[j] != ';') arg += String(argsStr[j]);
-                    else {
-                        args.push(arg);
-                        arg = "";
-                    }
-                }
-            }
-            args.push(arg);
-        }
-        var args1 = [];
-        for (var j = 0; j < args.length; j++) args1.push(String(Recognition(args[j]))); //console.log(args1);
-        args = args1;
-        if (operation == "Sum" || operation == "Sub") for (var j = 0; j < args.length; j++) if (args[j] == "") args[j] = "0";
-        {
-            var j = 0
-            for (; j < operations.length; j++) if (operations[j].name == operation && operations[j].args == args) break;
-            if (j >= operations.length) operations.push(new Operation(operation, args, operations));
-            var formula1 = "#" + String(j);
-            i++;
-            while (i < formula.length) formula1 += String(formula[i++]);
-            formula = formula1;
-        }
-    }
-    
-    return String(formula); 
-}
-
-function CalculationValue(value) {
-    value = String(value);
-    if (value == "") return new Complex(NaN);
-    if (value[0] == '#' /*&& value.length > 1*/) {
-        var id = ""; for (var i = 1; i < value.length; i++) id += String(value[i]);
-        const op = operations[Math.floor(id)];
-        if(op.relevance) return op.value;
-        var sargs = op.args;
-        var args2 = [];
-        args2.length = 0;
-        sargs.forEach(function(arg) { args2.push(CalculationValue(arg)); });
-        var args = args2; //console.log(args);
-
-        if (op.name == "") op.value = new Complex(args[0]);
-        else if (op.name.toLowerCase() == "eq") { //console.log(args);
-        	var result = args[0];
-            for (let i = 1; i < args.length; i++) {
-            	if(result.Abs() == Infinity && args[i].Abs() == Infinity && result.Arg() == args[i].Arg()) result = new Complex(0);
-                /*if(result.Re == Infinity && args[i].Re == Infinity) result = new Complex(0);
-                else if(result.Re == -Infinity && args[i].Re == -Infinity) result = new Complex(0);
-                else if(result.Im == Infinity && args[i].Im == Infinity) result = new Complex(0);
-                else if(result.Im == -Infinity && args[i].Im == -Infinity) result = new Complex(0);*/
-                else result = new Complex(result.Sub(args[i]).Abs());
-            }
-            op.value = new Complex(result);
-        }
-        else if (op.name.toLowerCase() == "lar") { //if (larger) formula1 = "Div(Sub(" + formula1 + ";Abs(" + formula1 + "));2)";
-            var result = args[0].Sub(args[1]).Re;
-            if (result > 0) result = 0;
-            op.value = new Complex(Math.abs(result));
-        }
-        else if (op.name.toLowerCase() == "les") { //if (less) formula1 = "Div(Sum(" + formula1 + ";Abs(" + formula1 + "));2)";
-            var result = args[0].Sub(args[1]).Re;
-            if (result < 0) result = 0;
-            op.value = new Complex(Math.abs(result));
-        }
-        else if (["or", "mex"].includes(op.name.toLowerCase())) {
-            var result = args[0].Abs();
-            for (let i = 1; i < args.length; i++) if ((args[i].Abs() < result || !(args[i].Abs() > result)) && (args[i].Abs() >= 0 || args[i].Abs() <= 0)) result = args[i].Abs();
-            op.value = new Complex(result);
-        }
-        else if (op.name.toLowerCase() == "and") {
-            var result = args[0].Abs();
-            for (var i = 1; i < args.length; i++) if ((args[i].Abs() > result || !(args[i].Abs() < result)) && (args[i].Abs() >= 0 || args[i].Abs() <= 0)) result = args[i].Abs();
-            op.value = new Complex(result);
-        }
-        else if (op.name.toLowerCase() == "complex") op.value = new Complex(args[0].Re, args[1].Re);
-        else if (op.name.toLowerCase() == "re") op.value = new Complex(args[0].Re);
-        else if (op.name.toLowerCase() == "im") op.value = new Complex(args[0].Im);
-        else if (op.name.toLowerCase() == "min") { //if (Math.Abs(b) < Math.Abs(a) || !(Math.Abs(b) > Math.Abs(a)) && (b >= 0 || b <= 0)) a = b;
-            var result = args[0].Re;
-            for (let i = 1; i < args.length; i++) if ((args[i].Re < result || !(args[i].Re > result)) && (args[i].Re >= 0 || args[i].Re <= 0)) result = args[i].Re;
-            op.value = new Complex(result);
-        }
-        else if (op.name.toLowerCase() == "max") {
-            var result = args[0].Re;
-            for (let i = 1; i < args.length; i++) if ((args[i].Re > result || !(args[i].Re < result)) && (args[i].Re >= 0 || args[i].Re <= 0)) result = args[i].Re;
-            op.value = new Complex(result);
-        }
-        else if (op.name.toLowerCase() == "round") op.value = args[0].Round();
-        else if (["uround", "ceil"].includes(op.name.toLowerCase())) op.value = args[0].Uround();
-        else if (["dround", "floor"].includes(op.name.toLowerCase())) op.value = args[0].Dround();
-        else if (op.name.toLowerCase() == "abs") op.value = new Complex(args[0].Abs());
-        else if (["sign", "sgn"].includes(op.name.toLowerCase())) op.value = args[0].Sign();
-        else if (op.name.toLowerCase() == "conj") op.value = args[0].Conj();
-        else if (op.name.toLowerCase() == "sum") {
-            var result = new Complex(args[0]);
-            for (let i = 1; i < args.length; i++) result = result.Sum(args[i]);
-            op.value = result;
-        }
-        else if (op.name.toLowerCase() == "sub") op.value = args[0].Sub(args[1]);
-        else if (op.name.toLowerCase() == "mul") {
-            var result = new Complex(args[0]);
-            for (let i = 1; i < args.length; i++) if(!Number.isNaN(args[i].Abs())) result = result.Mul(args[i]);
-            op.value = result;
-        }
-        else if (op.name.toLowerCase() == "div") op.value = args[0].Div(args[1]);
-        else if (op.name.toLowerCase() == "mod") op.value = args[0].Mod(args[1]);
-        else if (op.name.toLowerCase() == "gmod") op.value = args[0].Gmod(args[1]);
-        else if (["lcm", "нок"].includes(op.name.toLowerCase())) {
-            var result = new Complex(args[0]);
-            for (let i = 1; i < args.length; i++) result = result.Lcm(args[i]);
-            op.value = result;
-        }
-        else if (["gcd", "нод"].includes(op.name.toLowerCase())) {
-            var result = new Complex(args[0]);
-            for (let i = 1; i < args.length; i++) result = result.Gcd(args[i]);
-            op.value = result;
-        }
-        else if (["arg", "angle"].includes(op.name.toLowerCase())) op.value = new Complex(args[0].Arg()); 
-        else if (["drct", "expi"].includes(op.name.toLowerCase())) op.value = args[0].Drct();
-        else if (op.name.toLowerCase() == "exp") { if(args.length > 1) op.value = args[0].Exp(args[1]); else op.value = Complex.Pow(Math.E, args[0]); }
-        else if (op.name.toLowerCase() == "pow") op.value = args[0].Pow(args[1]);
-        else if (op.name.toLowerCase() == "sqrt") op.value = args[0].Pow(0.5);
-        else if (op.name.toLowerCase() == "root") { if(args.length > 1) op.value = args[0].Pow(new Complex(1).Div(args[1])); else op.value = args[0].Pow(0.5); }
-        else if (op.name.toLowerCase() == "ln") op.value = args[0].Ln();
-        else if (op.name.toLowerCase() == "lg") op.value = args[0].Log(10);
-        else if (op.name.toLowerCase() == "log") { if(args.length > 1) op.value = args[0].Log(args[1]); else op.value = args[0].Log(10);}
-        else if (op.name.toLowerCase() == "sin") op.value = args[0].Sin();
-        else if (op.name.toLowerCase() == "cos") op.value = args[0].Cos();
-        else if (["tan", "tg"].includes(op.name.toLowerCase())) op.value = args[0].Tan();
-        else if (op.name.toLowerCase() == "ctg") op.value = new Complex(1).Div(args[0].Tan());
-        else if (op.name.toLowerCase() == "sec") op.value = new Complex(1).Div(args[0].Cos());
-        else if (["csc", "cosec"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0].Sin());
-        else if (["asin", "arsin", "arcsin"].includes(op.name.toLowerCase())) op.value = args[0].Asin();
-        else if (["acos", "arcos", "arccos"].includes(op.name.toLowerCase())) op.value = args[0].Acos();
-        else if (["atan", "atg", "artan", "artg", "arctan"].includes(op.name.toLowerCase())) op.value = args[0].Atan();
-        else if (["actg", "arctg", "arcctg"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0]).Atan();
-        else if (["asec", "arsec", "arcsec"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0]).Acos();
-        else if (["acsc", "acosec", "arcsc", "arcosec", "arccsc", "arccosec"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0]).Asin();
-        else if (["sinh", "sh"].includes(op.name.toLowerCase())) op.value = args[0].Sh();
-        else if (["cosh", "ch"].includes(op.name.toLowerCase())) op.value = args[0].Ch();
-        else if (["tanh", "tgh", "th"].includes(op.name.toLowerCase())) op.value = args[0].Th();
-        else if (["ctgh", "cth"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0].Th());
-        else if (op.name.toLowerCase() == "sech") op.value = new Complex(1).Div(args[0].Ch());
-        else if (["csch", "cosech"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0].Sh());
-        else if (["asinh", "arsinh", "arcsinh", "ash", "arsh", "arcsh"].includes(op.name.toLowerCase())) op.value = args[0].Ash();
-        else if (["acosh", "arcosh", "arccosh", "ach", "arch", "arcch"].includes(op.name.toLowerCase())) op.value = args[0].Ach();
-        else if (["atanh", "atgh", "ath", "artanh", "artgh", "arth", "arctanh"].includes(op.name.toLowerCase())) op.value = args[0].Ath();
-        else if (["actgh", "arctgh", "arcctgh", "acth", "arcth", "arccth"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0]).Ath();
-        else if (["asech", "arsech", "arcsech"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0]).Ach();
-        else if (["acsch", "acosech", "arcsch", "arcosech", "arccsch", "arccosech"].includes(op.name.toLowerCase())) op.value = new Complex(1).Div(args[0]).Ash();
-        else if (op.name.toLowerCase() == "fct") op.value = args[0].Fct();
-        else if (op.name.toLowerCase() == "tetr") op.value = args[0].Tetr(args[1]);
-        //Def, Itg
-
-        op.relevance = true;
-        return op.value;
-    } //value[0]
-    else if (value == 'c') return c; //!
-    else if (value == 'x') return new Complex(c.Re);
-    else if (value == 'y') return new Complex(c.Im);
-    else if (value == 't') return new Complex(t);
-    else if (value == 'p') return new Complex(Math.PI);
-    else if (value == 'e') return new Complex(Math.E);
-    else if (value == 'i') return new Complex(0, 1);
-    else if (value == 'r') return new Complex(c.Abs());
-    else if (value == 'θ') return new Complex(c.Arg());
-    else if (value == '∞') return new Complex(Infinity);
-
-    else return new Complex(parseFloat(value));
 }
 
 function Calculation() {
     var i = 1;
     //try {
-        //для написания функции
+    	i = parser.CalculationValue(fValue, c, t).Abs();
+
+        if(animation) if (c.Re > sx - m / k && c.Re < sx + m / k && c.Im < -sy + m / k && c.Im > -sy - m / k) dist = i; //вывод расстояния до функции
+        if (c.Re == sx && c.Im == -sy) dist = i;
+    //} catch { }
+    if (i == 0) return 'rgb(0, 0, 0)';
+    else if (i == Infinity) return 'rgb(255, 255, 255)';
+    else {
+        i = Math.abs(i);
+        i = Math.log(i,2);
+        
+        if (i >= 0 || i <= 0) try {
+            var r = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 3.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (r > 255) r = 255; if (r < 0) r = 0; r = (3*r + 191)/4
+            var g = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 5.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (g > 255) g = 255; if (g < 0) g = 0; g = (2*g + 191)/3
+            var b = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 1.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (b > 255) b = 255; if (b < 0) b = 0; b = (4*b + 191)/5
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        catch { return 'rgb(159, 95, 95)'; }
+        else { return 'rgb(159, 95, 95)'; }
+    }
+} //Calculation
+
+function writeComplex(textBox, value) {
+	textBox.value = "";
+	if(value.Re > 0 || value.Re < 0 ) {
+		if(value.Re < 0) textBox.value += "–";
+		textBox.value += "" + Math.abs(value.Re);
+		if(value.Im > 0) textBox.value += " + ";
+		if(value.Im < 0) textBox.value += " – ";
+		if(value.Im > 0 || value.Im < 0) {
+			if(Math.abs(value.Im) != 1) textBox.value += Math.abs(value.Im) + "·i";
+			else textBox.value += "i";
+		}
+	} else if(value.Im > 0 || value.Im < 0) {
+		if(value.Im < 0) textBox.value += "–";
+		if(Math.abs(value.Im) != 1) textBox.value += Math.abs(value.Im) + "·i";
+		else textBox.value += "i";
+	} else if(value.Re === 0 && value.Im === 0) {
+		textBox.value = "0";
+	} else {
+		textBox.value = "Complex(" + value.Re + "; " + value.Im + ")";
+	}
+}
+
+function autocorrect(str) {
+	var str1 = "";
+	for (let i = 0; i < str.length; i++) if (str[i] != ' ' && str[i] != '\n') {
+		if (str[i] == ',') str1 += '.';
+		else if (str[i] == '−') str1 += '-';
+		else if (str[i] == '–') str1 += '-';
+		else if (str[i] == '—') str1 += '-';
+		else if (str[i] == '∞') str1 += "Infinity";
+		
+		else str1 += String(str[i]);
+	}
+	
+	if (str1 == 'e') return String(Math.E);
+	if (str1 == 'π') return String(Math.PI);
+	if (str1 == 'p') return String(Math.PI);
+	if (str1 == 't') return String(t);
+	if (str1 == 'x') return String(sx);
+	if (str1 == 'y') return String(-sy);
+	if (str1 == 'k') return String(255 / k);
+	if (str1 == 'r') return String(new Complex(sx, -sy).Abs());
+	if (str1 == 'θ') return String(new Complex(sx, -sy).Arg());
+	if (str1 == '⊤') return '0';
+	if (str1 == '⊥') return "Infinity";
+	
+	return str1;
+}
+
+
+//ОБРАБОТЧИКИ КНОПОК:
+
+function button1_Click() { //нажатие на кнопку "Анимация"
+    mReset();
+    animation = !animation;
+    if(animation) timer1Interval = 70;
+    else timer1Interval = 1;
+}
+
+function button4_Click() { //нажатие на кнопку "Меню"
+    //pictureBox1.style.zIndex = 1 - pictureBox1.style.zIndex;
+    menu.style.transform = 'translateY(0px)'; 
+}
+
+function button5_Click() { //нажатие на кнопку "Скрыть"
+	let h = menu.offsetHeight;
+    menu.style.transform = `translateY(${h + 30}px)`; 
+}
+
+function button7_Click() { //нажатие на кнопку "Выражение"
+	document.querySelectorAll('.slide').forEach(gb => {gb.style.transform = `translateX(0px)`;});
+	menuTabBtn.forEach(mtb => {mtb.style.backgroundColor = "#555555";});
+	button7.style.backgroundColor = "#777777";
+}
+
+function button8_Click() { //нажатие на кнопку "Положение"
+	let w = groupBox1.offsetWidth;
+	document.querySelectorAll('.slide').forEach(gb => {gb.style.transform = `translateX(${-1*w}px)`;});
+	menuTabBtn.forEach(mtb => {mtb.style.backgroundColor = "#555555";});
+	button8.style.backgroundColor = "#777777";
+}
+
+function button9_Click() { //нажатие на кнопку "Настройки"
+	let w = groupBox1.offsetWidth;
+	document.querySelectorAll('.slide').forEach(gb => {gb.style.transform = `translateX(${-2*w}px)`;});
+	/*groupBox1.style.transform = `translateX(${-2*w}px)`;
+	groupBox2.style.transform = `translateX(${-2*w}px)`;
+	groupBox3.style.transform = `translateX(${-2*w}px)`;
+	button7.style.backgroundColor = "#555555";
+	button8.style.backgroundColor = "#555555";*/
+	menuTabBtn.forEach(mtb => {mtb.style.backgroundColor = "#555555";});
+	button9.style.backgroundColor = "#777777";
+}
+
+function button13_Click() { //нажатие на кнопку "Калькулятор"
+	let w = groupBox1.offsetWidth;
+	document.querySelectorAll('.slide').forEach(gb => {gb.style.transform = `translateX(${-3*w}px)`;});
+	menuTabBtn.forEach(mtb => {mtb.style.backgroundColor = "#555555";});
+	button13.style.backgroundColor = "#777777";
+}
+
+function checkBox1_Click() { //переключение настройки "Скрыть кнопки масштабирования"
+	if(checkBox1.checked) {
+		controls.style.display = "none";
+	} else {
+		controls.style.display = "";
+	}
+}
+
+function checkBox2_Click() { //переключение настройки "Скрыть отображение координат в левом верхнем углу"
+	if(checkBox2.checked) {
+		label2.style.display = "none";
+	} else {
+		label2.style.display = "";
+	}
+}
+
+function checkBox3_Click() { //переключение настройки "Скрыть кнопки в левом нижнем углу"
+	if(checkBox3.checked) {
+		button4.style.opacity = 0;
+		button6.style.opacity = 0;
+	} else {
+		button4.style.opacity = 1;
+		button6.style.opacity = 1;
+	}
+}
+
+
+function menu_MouseDown(e) { //опускание кнопки мыши при нажатии на stretchArea
+	const rect = e.target.getBoundingClientRect();
+	Lm = e.clientY - rect.top; 
+	menu.style.transitionDuration = "0s";
+}
+
+function menu_TouchDown(e) { //опускание пальца при нажатии на stretchArea
+	const rect = e.target.getBoundingClientRect();
+	Lm = e.touches[0].clientY - rect.top;
+	menu.style.transitionDuration = "0s";
+}
+
+function menu_MouseMove(e) { //перемещение мыши по stretchArea
+	const rect = e.target.getBoundingClientRect();
+	var dm = e.clientY - rect.top;
+	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
+	if(menu.offsetHeight < 200) menu.style.height = "200px";
+	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
+	//Lm = dm;
+	textBox8.value = menu.offsetHeight;
+}
+
+function menu_TouchMove(e) { //перемещение пальца по stretchArea
+	const rect = e.target.getBoundingClientRect();
+	var dm = e.touches[0].clientY - rect.top;
+	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
+	if(menu.offsetHeight < 200) menu.style.height = "200px";
+	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
+	//Lm = dm;
+	textBox8.value = menu.offsetHeight;
+}
+
+function menu_MouseUp(e) { //поднятие кнопки мыши или пальца с stretchArea
+	menu.style.transitionDuration = "0.3s";
+}
+
+function button12_Click() { //нажатие на кнопку "Вернуть положение по умолчанию"
+	k = 255 / 5;
+    sx = 0;
+    sy = 0;
+    //t = 0;
+    textBox1.value = 255 / k;
+    textBox2.value = sx;
+    textBox3.value = -sy;
+    textBox4.value = t;
+    infoUpdate();
+    mReset();
+}
+
+function checkBox4_Click() { //переключение настройки "Скрыть координатную сетку"
+	displayGrid = !displayGrid;
+	mReset();
+}
+
+function richTextBox2_TextChanged() {
+	parser2.clear();
+    fValue2 = parser2.Recognition(String(richTextBox2.value));
+	var result = parser2.CalculationValue(fValue2, new Complex(sx, -sy), t);
+	writeComplex(textBox5, result);
+}
+
+function checkBox5_Click() {
+	if(!checkBox5.checked) {
+		label3.style.display = "none";
+	} else {
+		label3.style.display = "";
+	}
+}
+
+function button14_Click() {
+	dt = parseFloat(autocorrect(textBox6.value));
+	textBox6.value = dt;
+}
+
+function button15_Click() {
+	dt = 0.025;
+	textBox6.value = dt;
+}
+
+function button16_Click() {
+	dm = parseFloat(autocorrect(textBox7.value));
+	textBox7.value = dm;
+}
+
+function button17_Click() {
+	dm = 175;
+	textBox7.value = dm;
+}
+
+function button18_Click() {
+	menu.style.transitionDuration = "0s";
+	menu.style.height = `${parseFloat(autocorrect(textBox8.value))}px`;
+	if(menu.offsetHeight < 200) menu.style.height = "200px";
+	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
+	textBox8.value = menu.offsetHeight;
+	menu.style.transitionDuration = "0.3s";
+}
+
+function button19_Click() {
+	menu.style.transitionDuration = "0s";
+	menu.style.height = "300px";
+	textBox8.value = menu.offsetHeight;
+	menu.style.transitionDuration = "0.3s";
+}
+
+
+//СТАРЫЙ КОММЕНТАРИЙ ИЗ Calculation:
+
+//для написания функции
         // i = 0 = f(x, y)
         // c.Re = x
         // c.Im = y
-        i = CalculationValue(fValue).Abs(); //Sub(y; Sin(Mul(t; x)))
+        /*i = CalculationValue(fValue).Abs();*/ //Sub(y; Sin(Mul(t; x)))
         //i = new Complex(c.Re).Pow(c.Im).Sub(new Complex(c.Im).Pow(c.Re)).Abs();
 
         //double i4 = Complex.Pow(Math.E, Complex.Sub(c.Im, new Complex(0, t))).Sub(c.Re).Abs(); i = Min(i, i4);
@@ -925,7 +775,7 @@ function Calculation() {
 
         //i = c.Sin().Sub(Complex.Drct(t).Mul(2)).Abs();
 
-        dt = 0.025; //скорость анимации
+        /*dt = 0.025;*/ //скорость анимации
 
         //дополнительные приёмы:
         // if (i < 0) i = 0;  <=>  '=' -> '<' //замена равенства на сравнение
@@ -1024,341 +874,3 @@ function Calculation() {
         //i = Math.Tan(c.Re*c.Re + c.Im*c.Im) - 1;																																		//tan(x^2 + y^2) = 1
         //i = c.Re - Math.Tan(c.Im*c.Im);																																				//x = tan(y^2)
         //i = c.Re*c.Re - ((256 * Math.Pow(Math.Cos(Math.Pow(c.Im, 3)), 4) * Math.E * c.Re) % 2); if (i <= 0) i = 0;																	//x^2 <= (256 * cos(y^3)^4 * ex) mod 2
-
-        if(animation) if (c.Re > sx - m / k && c.Re < sx + m / k && c.Im < -sy + m / k && c.Im > -sy - m / k) dist = i; //вывод расстояния до функции
-        if (c.Re == sx && c.Im == -sy) dist = i;
-    //} catch { }
-    if (i == 0) return 'rgb(0, 0, 0)';
-    else if (i == Infinity) return 'rgb(255, 255, 255)';
-    else {
-        i = Math.abs(i);
-        i = Math.log(i,2);
-        
-        if (i >= 0 || i <= 0) try {
-            var r = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 3.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (r > 255) r = 255; if (r < 0) r = 0; r = (3*r + 191)/4
-            var g = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 5.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (g > 255) g = 255; if (g < 0) g = 0; g = (2*g + 191)/3
-            var b = Math.floor((127 - Math.floor(255.0 * (Math.cos(i / 5.0 + 1.0 * Math.PI / 3.0)) + 0.0) / 1.0 * 1.0) / 1); if (b > 255) b = 255; if (b < 0) b = 0; b = (4*b + 191)/5
-            return `rgb(${r}, ${g}, ${b})`;
-        }
-        catch { return 'rgb(159, 95, 95)'; }
-        else { return 'rgb(159, 95, 95)'; }
-    }
-}
-
-function button1_Click() {
-    mReset();
-    animation = !animation;
-    if(animation) timer1Interval = 70;
-    else timer1Interval = 1;
-}
-
-function button4_Click() {
-    //pictureBox1.style.zIndex = 1 - pictureBox1.style.zIndex;
-    menu.style.transform = 'translateY(0px)'; 
-}
-
-function button5_Click() {
-	let h = menu.offsetHeight;
-    menu.style.transform = `translateY(${h + 30}px)`; 
-}
-
-function button7_Click() {
-	groupBox1.style.transform = 'translateX(0px)';
-	groupBox2.style.transform = 'translateX(0px)';
-	groupBox3.style.transform = 'translateX(0px)';
-	button7.style.backgroundColor = "#777777";
-	button8.style.backgroundColor = "#555555";
-	button9.style.backgroundColor = "#555555";
-}
-
-function button8_Click() {
-	let w = groupBox1.offsetWidth;
-	groupBox1.style.transform = `translateX(${-w}px)`;
-	groupBox2.style.transform = `translateX(${-w}px)`;
-	groupBox3.style.transform = `translateX(${-w}px)`;
-	button7.style.backgroundColor = "#555555";
-	button8.style.backgroundColor = "#777777";
-	button9.style.backgroundColor = "#555555";
-}
-
-function button9_Click() {
-	let w = groupBox1.offsetWidth;
-	groupBox1.style.transform = `translateX(${-2*w}px)`;
-	groupBox2.style.transform = `translateX(${-2*w}px)`;
-	groupBox3.style.transform = `translateX(${-2*w}px)`;
-	button7.style.backgroundColor = "#555555";
-	button8.style.backgroundColor = "#555555";
-	button9.style.backgroundColor = "#777777";
-}
-
-function checkBox1_Click() {
-	if(checkBox1.checked) {
-		controls.style.display = "none";
-	} else {
-		controls.style.display = "";
-	}
-}
-
-function checkBox2_Click() {
-	if(checkBox2.checked) {
-		info.style.display = "none";
-	} else {
-		info.style.display = "";
-	}
-}
-
-function checkBox3_Click() {
-	if(checkBox3.checked) {
-		button4.style.opacity = 0;
-		button6.style.opacity = 0;
-	} else {
-		button4.style.opacity = 1;
-		button6.style.opacity = 1;
-	}
-}
-
-
-function menu_MouseDown(e) {
-	const rect = e.target.getBoundingClientRect();
-	Lm = e.clientY - rect.top; 
-	menu.style.transitionDuration = "0s";
-}
-
-function menu_TouchDown(e) {
-	const rect = e.target.getBoundingClientRect();
-	Lm = e.touches[0].clientY - rect.top;
-	menu.style.transitionDuration = "0s";
-}
-
-function menu_MouseMove(e) {
-	const rect = e.target.getBoundingClientRect();
-	var dm = e.clientY - rect.top;
-	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
-	if(menu.offsetHeight < 200) menu.style.height = "200px";
-	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
-	//Lm = dm;
-}
-
-function menu_TouchMove(e) {
-	const rect = e.target.getBoundingClientRect();
-	var dm = e.touches[0].clientY - rect.top;
-	menu.style.height = `${menu.offsetHeight + Lm - dm}px`;
-	if(menu.offsetHeight < 200) menu.style.height = "200px";
-	if(menu.offsetHeight > window.innerHeight) menu.style.height = `${window.innerHeight}px`;
-	//Lm = dm;
-}
-
-function menu_MouseUp(e) {
-	menu.style.transitionDuration = "0.3s";
-}
-
-function button12_Click() {
-	k = 255 / 5;
-    sx = 0;
-    sy = 0;
-    //t = 0;
-    textBox1.value = 255 / k;
-    textBox2.value = sx;
-    textBox3.value = -sy;
-    textBox4.value = t;
-    infoUpdate();
-    mReset();
-}
-
-function checkBox4_Click() {
-	displayGrid = !displayGrid;
-	mReset();
-}
-
-function keyBtnSym_Click(e) {
-	/*if(rtb1Selection) {
-		lastRTB1SelectionStart = richTextBox1.selectionStart;
-		lastRTB1SelectionEnd = richTextBox1.selectionEnd;
-	}*/
-	const btn = e.currentTarget;
-	var str = richTextBox1.value;
-	var str1 = "";
-	for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-	str1 += String(btn.textContent);
-	for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-	richTextBox1.value = str1;
-	lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length;
-	richTextBox1.focus();
-}
-
-function btnBackSpace_Click() {
-	var str = richTextBox1.value;
-	var str1 = "";
-	if(lastRTB1SelectionStart == lastRTB1SelectionEnd) {
-		for(let i = 0; i < lastRTB1SelectionStart - 1; i++) str1 += String(str[i]);
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		if(lastRTB1SelectionStart - 1 >= 0) lastRTB1SelectionEnd = --lastRTB1SelectionStart;
-	} else {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart;
-	}
-	richTextBox1.value = str1;
-	richTextBox1.focus();
-}
-
-function btnDelete_Click() {
-	var str = richTextBox1.value;
-	var str1 = "";
-	if(lastRTB1SelectionStart == lastRTB1SelectionEnd) {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		for(let i = lastRTB1SelectionEnd + 1; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart;
-	} else {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart;
-	}
-	richTextBox1.value = str1;
-	richTextBox1.focus();
-}
-
-function btnSpace_Click() {
-	var str = richTextBox1.value;
-	var str1 = "";
-	for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-	str1 += " ";
-	for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-	richTextBox1.value = str1;
-	lastRTB1SelectionEnd = ++lastRTB1SelectionStart;
-	richTextBox1.focus();
-}
-
-function btnEnter_Click() {
-	var str = richTextBox1.value;
-	var str1 = "";
-	for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-	str1 += "\n";
-	for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-	richTextBox1.value = str1;
-	lastRTB1SelectionEnd = ++lastRTB1SelectionStart;
-	richTextBox1.focus();
-}
-
-function btnLeft_Click() {
-	if(lastRTB1SelectionEnd-1 >= 0) lastRTB1SelectionStart = --lastRTB1SelectionEnd;
-	richTextBox1.focus();
-}
-
-function btnRight_Click() {
-	if(lastRTB1SelectionEnd+1 <= richTextBox1.value.length) lastRTB1SelectionStart = ++lastRTB1SelectionEnd;
-	richTextBox1.focus();
-}
-
-function btnKeyboard_Click() {
-	richTextBox1.blur();
-	richTextBox1.virtualKeyboardPolicy = 'auto';
-	requestAnimationFrame(() => {richTextBox1.focus();});
-	navigator.virtualKeyboard?.show();
-	/*if(virtualKeyboard) {
-		navigator.virtualKeyboard?.hide();
-	} else {
-		navigator.virtualKeyboard?.show();
-	}
-	virtualKeyboard = !virtualKeyboard;*/
-}
-
-for (const type of [
-    'beforeinput',
-    'input',
-    'compositionstart',
-    'compositionupdate',
-    'compositionend'
-]) {
-    richTextBox1.addEventListener(type, e => {
-        console.log(type, {
-            data: e.data,
-            value: richTextBox1.value,
-            composing: e.isComposing
-        });
-    });
-}
-
-function keyTabBtn1_Click() {
-	richTextBox1.focus();
-	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
-	keyTabBtn1.style.backgroundColor = "#444444";
-	let h = keyGroupBox1.offsetHeight;
-	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-0*h}px)`;});
-}
-
-function keyTabBtn2_Click() {
-	richTextBox1.focus();
-	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
-	keyTabBtn2.style.backgroundColor = "#444444";
-	let h = keyGroupBox1.offsetHeight;
-	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-1*h}px)`;});
-}
-
-function keyTabBtn3_Click() {
-	richTextBox1.focus();
-	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
-	keyTabBtn3.style.backgroundColor = "#444444";
-	let h = keyGroupBox1.offsetHeight;
-	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-2*h}px)`;});
-}
-
-function keyTabBtn4_Click() {
-	richTextBox1.focus();
-	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
-	keyTabBtn4.style.backgroundColor = "#444444";
-	let h = keyGroupBox1.offsetHeight;
-	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-3*h}px)`;});
-}
-
-/*function keyTabBtn5_Click() {
-	richTextBox1.focus();
-	document.querySelectorAll('.keyTabBtn').forEach(ktb => {ktb.style.backgroundColor = "#666666";});
-	keyTabBtn5.style.backgroundColor = "#444444";
-	let h = keyGroupBox1.offsetHeight;
-	keySlide.forEach(kgb => {kgb.style.transform = `translateY(${-4*h}px)`;});
-}*/
-
-function keyBtnFuc1_Click(e) {
-	const btn = e.currentTarget;
-	var str = richTextBox1.value;
-	var str1 = "";
-	if(lastRTB1SelectionEnd == lastRTB1SelectionStart) {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		str1 += String(btn.textContent) + "()";
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+1;
-	} else {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		str1 += String(btn.textContent) + "(";
-		let j = 0;
-		for(let i = lastRTB1SelectionStart; i < lastRTB1SelectionEnd; i++, j++) str1 += String(str[i]);
-		str1 += ")";
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+2+j;
-	}
-	richTextBox1.value = str1;
-	richTextBox1.focus();
-}
-
-function keyBtnFuc2_Click(e) {
-	const btn = e.currentTarget;
-	var str = richTextBox1.value;
-	var str1 = "";
-	if(lastRTB1SelectionEnd == lastRTB1SelectionStart) {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		str1 += String(btn.textContent) + "(; )";
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+1;
-	} else {
-		for(let i = 0; i < lastRTB1SelectionStart; i++) str1 += String(str[i]);
-		str1 += String(btn.textContent) + "(";
-		let j = 0;
-		for(let i = lastRTB1SelectionStart; i < lastRTB1SelectionEnd; i++, j++) str1 += String(str[i]);
-		str1 += "; )";
-		for(let i = lastRTB1SelectionEnd; i < str.length; i++) str1 += String(str[i]);
-		lastRTB1SelectionEnd = lastRTB1SelectionStart += btn.textContent.length+3+j;
-	}
-	richTextBox1.value = str1;
-	richTextBox1.focus();
-}
